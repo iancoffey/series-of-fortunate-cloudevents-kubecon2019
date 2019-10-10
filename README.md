@@ -1,9 +1,13 @@
 # kubecon-cloudevent-demo-app
 
-Lets create a whole end to end pipeline in a namespace, check the code out and send some events!
+Automated conversations imagines an alternate method of allowing semi-prescripted conversations to play out in a sandbox environment.
 
-##
+We will put CloudEvents and Knative Eventing to work making this machinery possible!
 
-https://github.com/knative/docs/tree/master/docs/eventing/samples/kubernetes-event-source#deployment-steps ?
+## Create an actor
 
-Button factory -> Hey! CRD (lol!) -> reconciler makes knative event trigger -> knative eventing ApiServerSource -> Broker -> Correcy registered hey client
+The `bin/add_actor $NAME $GREETING` script will populate our conversation with a new actor.
+
+No other steps are needed for the actor to join the conversation. The actor is assigned a randomized script, which is mounted in a configmap.
+
+Actors only address other actors they have words for, but they can reply to anyone with their default greeting.
