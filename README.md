@@ -1,8 +1,8 @@
 # kubecon-cloudevent-demo-app
 
-Automated conversations imagines an alternate method of allowing semi-prescripted conversations to play out in a sandbox environment.
+This session will work to leverage CloudEvents and Knative Eventing to build a solution to automated conversations, with the conversation flow provided by the base projects.
 
-We will put CloudEvents and Knative Eventing to work making this machinery possible!
+New actors will boot and make themselves known to the group, and after this, they will just begin conversing!
 
 ## Create an actor
 
@@ -11,3 +11,18 @@ The `bin/add_actor $NAME $GREETING` script will populate our conversation with a
 No other steps are needed for the actor to join the conversation. The actor is assigned a randomized script, which is mounted in a configmap.
 
 Actors only address other actors they have words for, but they can reply to anyone with their default greeting.
+
+## Conversation
+
+All of our actors get a conversation type, and each type defines a simple disposition.
+
+type Exchange struct {
+  Sent string
+  Recieved string
+}
+
+```
+type Conversation struct {
+  Greeting []Exchange //
+  Compliment []Exchange
+}

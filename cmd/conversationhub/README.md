@@ -6,4 +6,6 @@ So, gather up some bots and lets chat!
 
 ## API
 
-The conversation hub Recieves and Processes kubernetes events into 
+Using knative brokers and filter triggers, we can create a synthetic conversation environment using the CloudEvent spec.
+
+This is purely an educational exercise.
