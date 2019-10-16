@@ -13,20 +13,20 @@ spec:
     apiVersion: messaging.knative.dev/v1alpha1
     kind: InMemoryChannel
 ---
-apiVersion: eventing.knative.dev/v1alpha1
-kind: Trigger
-metadata:
-  name: dave-trigger # these will be created by bin/add_actor
-  namespace: work-conversation
-spec:
-  broker: conversation-broker
-  filter:
-    attributes:
-      type: com.iancoffey.conversations.message
-      subject: dave
-  subscriber:
-    ref:
-      apiVersion: serving.knative.dev/v1alpha1
-      kind: Service
-      name: dave
+#apiVersion: eventing.knative.dev/v1alpha1
+#kind: Trigger
+#metadata:
+#  name: dave-trigger # these will be created by bin/add_actor
+#  namespace: work-conversation
+#spec:
+#  broker: conversation-broker
+#  filter:
+#    attributes:
+#      type: com.iancoffey.conversations.message
+#      subject: dave
+#  subscriber:
+#    ref:
+#      apiVersion: serving.knative.dev/v1alpha1
+#      kind: Service
+#      name: dave
 

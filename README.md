@@ -26,3 +26,7 @@ type Conversation struct {
   Greeting []Exchange //
   Compliment []Exchange
 }
+
+## Logs
+
+`k logs -l "serving.knative.dev/service=frank" -n work-conversation`

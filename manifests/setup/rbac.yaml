@@ -1,0 +1,36 @@
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: actor-role
+  namespace: work-conversation
+rules:
+- apiGroups:
+    - sources.eventing.knative.dev
+  resources:
+  - containersources
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: actor-account
+  namespace: work-conversation
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: actor-binding
+  namespace: work-conversation
+subjects:
+  - kind: ServiceAccount
+    name: actor-account
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: actor-role

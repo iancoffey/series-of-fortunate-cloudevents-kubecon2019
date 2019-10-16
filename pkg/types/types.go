@@ -16,17 +16,16 @@ import (
 )
 
 const (
-	helloEventType        = "com.iancoffey.conversation.message.hello"
-	goodnightEventType    = "com.iancoffey.conversation.message.goodbye"
-	conversationEventType = "com.iancoffey.conversation.message.conversation"
-	asleepEventType       = "com.iancoffey.conversation.message.asleep"
-	angryEventType        = "com.iancoffey.conversation.message.angry"
+	HelloEventType        = "com.iancoffey.conversation.message.hello"
+	GoodnightEventType    = "com.iancoffey.conversation.message.goodbye"
+	ConversationEventType = "com.iancoffey.conversation.message.conversation"
+	AsleepEventType       = "com.iancoffey.conversation.message.asleep"
+	AngryEventType        = "com.iancoffey.conversation.message.angry"
 )
 
 type Actor struct {
-	Sink            string `env:"SINK,default=""`
-	Name            string `env:"SERVER_HOSTNAME,default=ian"`
-	MessagesData    string `env:"MESSAGES_DATA,default=localhost"`
+	Name            string `env:"NAME,default=ian"`
+	MessagesData    string `env:"MESSAGES_DATA,default={}"`
 	ConvoListenPort uint16 `env:"PORT,default=8080"`
 	StatsListenPort uint16 `env:"STATS_PORT,default=8082"`
 	ConvoBroker     string `env:"CONVO_BROKER,default=conversation-broker"`
@@ -65,7 +64,7 @@ type ConversationManifests struct {
 }
 
 func (a *Actor) AsleepMessage() Exchange {
-	return a.Conversation.Hello[rand.Intn(len(a.Conversation.Hello))]
+	return a.Conversation.Asleep[rand.Intn(len(a.Conversation.Asleep))]
 }
 func (a *Actor) HelloMessage() Exchange {
 	return a.Conversation.Hello[rand.Intn(len(a.Conversation.Hello))]
@@ -73,19 +72,22 @@ func (a *Actor) HelloMessage() Exchange {
 func (a *Actor) AngryMessage() Exchange {
 	return a.Conversation.Angry[rand.Intn(len(a.Conversation.Angry))]
 }
+func (a *Actor) GoodbyeMessage() Exchange {
+	return a.Conversation.Goodbye[rand.Intn(len(a.Conversation.Goodbye))]
+}
 
 func (a *Actor) Introduction() error {
 	switch {
 	case a.Asleep:
-		if err := a.SpeakToAll(asleepEventType, a.AsleepMessage()); err != nil {
+		if err := a.SpeakToAll(AsleepEventType, a.AsleepMessage()); err != nil {
 			return err
 		}
 	case a.Angry:
-		if err := a.SpeakToAll(angryEventType, a.HelloMessage()); err != nil {
+		if err := a.SpeakToAll(AngryEventType, a.AngryMessage()); err != nil {
 			return err
 		}
 	default:
-		if err := a.SpeakToAll(helloEventType, a.AngryMessage()); err != nil {
+		if err := a.SpeakToAll(HelloEventType, a.HelloMessage()); err != nil {
 			return err
 		}
 	}
@@ -93,25 +95,27 @@ func (a *Actor) Introduction() error {
 }
 
 // on Term or Int, send everyone Goodbye!
-func (a *Actor) handleTerm() {
+func (a *Actor) HandleTerm(done chan<- bool) {
 	sigs := make(chan os.Signal, 1)
-	done := make(chan bool, 1)
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
-		sig := <-sigs
-		fmt.Println(sig)
+		<-sigs
+		a.SpeakToAll(GoodnightEventType, a.GoodbyeMessage())
 		done <- true
 	}()
 }
 
 func (a *Actor) SpeakToAll(eventType string, e Exchange) error {
-	//cs := a.ContainerSource(eventType, "all", e.Output)
-	//	err := a.sourcesClient.EventingV1alpha1()
-	return nil
+	cs := a.ContainerSource(eventType, "all", e.Output)
+	_, err := a.EventingClient.SourcesV1alpha1().ContainerSources(a.Namespace).Create(cs)
+	return err
 }
 
-func SpeakToPerson() {
+func (a *Actor) StatsEndpoint() {
+}
+
+func (a *Actor) SpeakToPerson() {
 }
 
 func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
@@ -169,9 +173,10 @@ func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourc
 				},
 			},
 			Sink: &corev1.ObjectReference{
-				Name:      a.ConvoBroker,
-				Namespace: a.Namespace,
-				Kind:      "eventingv1.Broker",
+				Name:       a.ConvoBroker,
+				Namespace:  a.Namespace,
+				Kind:       "Broker",
+				APIVersion: "eventing.knative.dev/v1alpha1",
 			},
 		},
 	}

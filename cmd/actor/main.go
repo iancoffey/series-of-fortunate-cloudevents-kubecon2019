@@ -32,10 +32,10 @@ func main() {
 	var actor types.Actor
 	err := envdecode.StrictDecode(&actor)
 
-	log.Printf("% wakes up and looks around", actor.Name)
+	log.Printf("%s wakes up and looks around", actor.Name)
 
 	// we need to load our
-	manifest := types.ConversationManifests{}
+	manifest := &types.ConversationManifests{}
 	if err := json.Unmarshal([]byte(actor.MessagesData), manifest); err != nil {
 		log.Fatalf("%s had an error ", err)
 	}
@@ -80,8 +80,8 @@ func main() {
 
 	// then we can enable our stats endpoint
 	// we can maybe use prometheus to see our conversation metrics go nuts!
-	//go actor.statsEndpoint()
+	go actor.StatsEndpoint()
 
-	<-done
-	SpeakToAll(Goodbye)
+	done := make(chan bool, 1)
+	go actor.HandleTerm(done)
 }

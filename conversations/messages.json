@@ -1,7 +1,7 @@
 {
   "conversations": [
     {
-      "hello": [
+    "hello": [
         {
           "output": "heyo",
           "input": "nice to see you"
@@ -9,8 +9,26 @@
       ],
       "goodbye": [
         {
-        "output": "ight im out",
-        "input": "ttyl"
+          "output": "ight im out",
+          "input": "ttyl"
+        }
+      ],
+      "conversation": [
+        {
+          "output": "I love to fish!",
+          "input": "Oh you dont say?"
+        }
+      ],
+      "asleep": [
+        {
+          "output": "zzzzzzzz",
+          "input": "night night!"
+        }
+      ],
+      "angry": [
+        {
+          "output": "IM SO MAD",
+          "input": "wow chill"
         }
       ]
     }
