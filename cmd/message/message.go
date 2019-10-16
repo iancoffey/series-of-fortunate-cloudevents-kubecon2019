@@ -27,6 +27,9 @@ type envConfig struct {
 
 	// Name of the recipient which maps to a broker->trogger setup. All folks are subscribed to the to the "all" events.
 	RecipientName string `env:"RECIPIENT_NAME"`
+
+	// Message we are sending
+	Message string `env:"MESSAGE"`
 }
 
 func main() {

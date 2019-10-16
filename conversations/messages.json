@@ -1,0 +1,18 @@
+{
+  "conversations": [
+    {
+      "hello": [
+        {
+          "output": "heyo",
+          "input": "nice to see you"
+        }
+      ],
+      "goodbye": [
+        {
+        "output": "ight im out",
+        "input": "ttyl"
+        }
+      ]
+    }
+  ]
+}
