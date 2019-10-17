@@ -11,7 +11,6 @@ import (
 	"github.com/iancoffey/kubecon-cloudevent-demo-app/pkg/types"
 	"github.com/joeshaw/envdecode"
 	"k8s.io/client-go/rest"
-	//eventingv1 "knative.dev/eventing/pkg/apis/eventing/v1alpha1"
 	eventingClientset "knative.dev/eventing/pkg/client/clientset/versioned"
 )
 
@@ -43,6 +42,10 @@ func main() {
 	// we want to pick a random conversation profile for our new actor
 	actor.Conversation = (convos)[rand.Intn(len(convos))]
 
+	if actor.Debug {
+		log.Println("Creating clientset")
+	}
+
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		log.Fatalf("unable to create rest config: %q", err)
@@ -53,6 +56,10 @@ func main() {
 		log.Fatalf("unable to create eventingv1 client: %q", err)
 	}
 	actor.EventingClient = *clientset
+
+	if actor.Debug {
+		log.Println("Creating cloudevent client")
+	}
 
 	// setup CloudEvents client
 	t, err := cloudevents.NewHTTPTransport(
@@ -67,16 +74,33 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to create cloudevent client: %q", err)
 	}
+
+	if actor.Debug {
+		log.Println("Starting CloudEvent Receiver")
+	}
+
 	// first our actor starts Listening
 	go c.StartReceiver(ctx, actor.GotMessage)
+
+	if actor.Debug {
+		log.Println("Introduction time")
+	}
 
 	// now we can introduce ourselves, and everyone can start to figure out our mood
 	if err := actor.Introduction(); err != nil {
 		log.Fatalf("%s had a problem introducing themself! err=%q", err)
 	}
 
+	if actor.Debug {
+		log.Println("TickMessages time")
+	}
+
 	// then we can start our conversation Ticker
 	go actor.TickMessages()
+
+	if actor.Debug {
+		log.Println("Stats Endpoint")
+	}
 
 	// then we can enable our stats endpoint
 	// we can maybe use prometheus to see our conversation metrics go nuts!
@@ -84,4 +108,8 @@ func main() {
 
 	done := make(chan bool, 1)
 	go actor.HandleTerm(done)
+	<-done
+	if actor.Debug {
+		log.Println("After Done!")
+	}
 }

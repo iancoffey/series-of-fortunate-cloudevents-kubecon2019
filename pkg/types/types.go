@@ -16,11 +16,17 @@ import (
 )
 
 const (
-	HelloEventType        = "com.iancoffey.conversation.message.hello"
-	GoodnightEventType    = "com.iancoffey.conversation.message.goodbye"
-	ConversationEventType = "com.iancoffey.conversation.message.conversation"
-	AsleepEventType       = "com.iancoffey.conversation.message.asleep"
-	AngryEventType        = "com.iancoffey.conversation.message.angry"
+	MessageEventType = "com.iancoffey.conversation.message"
+
+	// ohhh fun. lets cast this last and put everyone to sleep
+	SleepSpellEventType = "com.iancoffey.conversation.sleepspell"
+
+	// Here we have the moods our actors will find themselves in
+	HelloType        = "message.hello"
+	GoodnightType    = "message.goodbye"
+	ConversationType = "message.conversation"
+	AsleepType       = "message.asleep"
+	AngryType        = "message.angry"
 )
 
 type Actor struct {
@@ -32,6 +38,7 @@ type Actor struct {
 	Greeting        string `env:"GREETING,default=hello"`
 	Asleep          bool   `env:"ASLEEP,default=false"`
 	Angry           bool   `env:"ANGRY,default=false"`
+	Debug           bool   `env:"DEBUG,default=false"`
 	Namespace       string `env:"NAMESPACE,default=work-conversation"`
 	MessageImage    string `env:"MESSAGE_IMAGE,default=iancoffey/conversation-message:latest"`
 
@@ -46,6 +53,11 @@ type Actor struct {
 type Exchange struct {
 	Output string `json:"output,omitempty"`
 	Input  string `json:"input,omitempty"`
+}
+
+type EventPayload struct {
+	Message string `json:"Message"`
+	Off     bool   `json:"OFF,default=false"`
 }
 
 // Standard topic types, which map directly to CloudEvent Type
@@ -79,35 +91,22 @@ func (a *Actor) GoodbyeMessage() Exchange {
 func (a *Actor) Introduction() error {
 	switch {
 	case a.Asleep:
-		if err := a.SpeakToAll(AsleepEventType, a.AsleepMessage()); err != nil {
+		if err := a.SpeakToAll(MessageEventType, AsleepType, a.AsleepMessage()); err != nil {
 			return err
 		}
 	case a.Angry:
-		if err := a.SpeakToAll(AngryEventType, a.AngryMessage()); err != nil {
+		if err := a.SpeakToAll(MessageEventType, AngryType, a.AngryMessage()); err != nil {
 			return err
 		}
 	default:
-		if err := a.SpeakToAll(HelloEventType, a.HelloMessage()); err != nil {
+		if err := a.SpeakToAll(MessageEventType, HelloType, a.HelloMessage()); err != nil {
 			return err
 		}
 	}
 	return nil
 }
-
-// on Term or Int, send everyone Goodbye!
-func (a *Actor) HandleTerm(done chan<- bool) {
-	sigs := make(chan os.Signal, 1)
-
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-sigs
-		a.SpeakToAll(GoodnightEventType, a.GoodbyeMessage())
-		done <- true
-	}()
-}
-
-func (a *Actor) SpeakToAll(eventType string, e Exchange) error {
-	cs := a.ContainerSource(eventType, "all", e.Output)
+func (a *Actor) SpeakToAll(eventType, mood string, e Exchange) error {
+	cs := a.ContainerSource(eventType, "all", e.Output, mood)
 	_, err := a.EventingClient.SourcesV1alpha1().ContainerSources(a.Namespace).Create(cs)
 	return err
 }
@@ -119,13 +118,11 @@ func (a *Actor) SpeakToPerson() {
 }
 
 func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
-	data := &Conversation{}
-	if err := event.DataAs(data); err != nil {
+	payload := &EventPayload{}
+	if err := event.DataAs(&payload); err != nil {
 		fmt.Printf("Got Data Error: %s\n", err.Error())
 	}
-	fmt.Printf("Got Data: %+v\n", data)
-
-	fmt.Printf(" TIME TO REPLY - CREATE CONTAINER SOURCE\n")
+	fmt.Printf("Got Data: %+v\n", payload)
 	return nil
 }
 
@@ -133,11 +130,15 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 func (a *Actor) TickMessages() {
 }
 
-func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourcesv1.ContainerSource {
+func (a *Actor) ContainerSource(eventType, recipientName, message, mood string) *sourcesv1.ContainerSource {
+	labels := make(map[string]string)
+	labels["actor"] = a.Name
+
 	return &sourcesv1.ContainerSource{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: a.Name,
 			Namespace:    a.Namespace,
+			Labels:       labels,
 		},
 		Spec: sourcesv1.ContainerSourceSpec{
 			Template: &corev1.PodTemplateSpec{
@@ -167,6 +168,10 @@ func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourc
 									Name:  "MESSAGE",
 									Value: message,
 								},
+								{
+									Name:  "MOOD",
+									Value: mood,
+								},
 							},
 						},
 					},
@@ -180,4 +185,16 @@ func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourc
 			},
 		},
 	}
+}
+
+// on Term or Int, send everyone Goodbye!
+func (a *Actor) HandleTerm(done chan<- bool) {
+	sigs := make(chan os.Signal, 1)
+
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigs
+		a.SpeakToAll(MessageEventType, GoodnightType, a.GoodbyeMessage())
+		done <- true
+	}()
 }

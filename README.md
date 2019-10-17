@@ -27,6 +27,11 @@ type Conversation struct {
   Compliment []Exchange
 }
 
-## Logs
+## Log / Output Commands for demo
 
-`k logs -l "serving.knative.dev/service=frank" -n work-conversation`
+k logs -l "serving.knative.dev/service=frank" -n work-conversation --all-containers
+
+k describe containersource.sources.eventing.knative.dev -n work-conversation
+
+# Message containersource output
+k logs -l actor=frank -n work-conversation
