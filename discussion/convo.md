@@ -9,6 +9,14 @@ So what we are aiming to do in this session is to automate a simple conversation
 We will build this using CloudEvents, Knative eventing, intentionally silly custom resources and a few simple Services, which will act as our personalities.
 
 
+## Ending
+
+### What was the point? Well it was really quite obvious to me that writing all of this silly code w/o CloudEvents would not have worked quite as well.
+
+Having the cloudevents spec made it much easier for me, at least, to then focus on the details of the implementation and business logic more clearly. And this felt like a considerable win during the process of building this demo.
+
+Beyond any project in specific, beyond CloudEvents, I think its a great use of time to be thinking about message format standardization, event format standards and the like, because it means we open doors for new opportunities to connect data with processing power and new ideas, across boundries where we couldnt before.
+
 --
 
 Actors boot up and run container source image which just sends registration

@@ -54,8 +54,8 @@ func main() {
 		Context: cloudevents.EventContextV03{
 			ID:      uuid.New().String(),
 			Type:    cfg.EventType,
-			Subject: &cfg.SenderName,
-			Source:  *types.ParseURLRef(cfg.RecipientName),
+			Subject: &cfg.RecipientName,
+			Source:  *types.ParseURLRef(cfg.SenderName),
 		}.AsV03(),
 		Data: payload,
 	}

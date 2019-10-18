@@ -22,6 +22,8 @@ const (
 	interjectInConvoRate = 30 * time.Second
 	// bind address
 	localBindAddress = "http://0.0.0.0:8080/"
+	// we need time for dns to start resolving
+	wakeUpDelay = 20 * time.Second
 )
 
 func main() {
@@ -42,10 +44,6 @@ func main() {
 	// we want to pick a random conversation profile for our new actor
 	actor.Conversation = (convos)[rand.Intn(len(convos))]
 
-	if actor.Debug {
-		log.Println("Creating clientset")
-	}
-
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		log.Fatalf("unable to create rest config: %q", err)
@@ -56,10 +54,6 @@ func main() {
 		log.Fatalf("unable to create eventingv1 client: %q", err)
 	}
 	actor.EventingClient = *clientset
-
-	if actor.Debug {
-		log.Println("Creating cloudevent client")
-	}
 
 	// setup CloudEvents client
 	t, err := cloudevents.NewHTTPTransport(
@@ -74,42 +68,28 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to create cloudevent client: %q", err)
 	}
+	// We need to pause a sec and let everything settle
+	time.Sleep(wakeUpDelay)
 
-	if actor.Debug {
-		log.Println("Starting CloudEvent Receiver")
-	}
+	// A one-time GC run per actor is fine
+	a.GarbageCollect()
 
 	// first our actor starts Listening
 	go c.StartReceiver(ctx, actor.GotMessage)
-
-	if actor.Debug {
-		log.Println("Introduction time")
-	}
 
 	// now we can introduce ourselves, and everyone can start to figure out our mood
 	if err := actor.Introduction(); err != nil {
 		log.Fatalf("%s had a problem introducing themself! err=%q", err)
 	}
 
-	if actor.Debug {
-		log.Println("TickMessages time")
-	}
+	//go actor.StatsEndpoint()
 
+	//	done := make(chan bool, 1)
+	//	go actor.HandleTerm(done)
+	//	<-done
 	// then we can start our conversation Ticker
-	go actor.TickMessages()
-
+	actor.TickMessages()
 	if actor.Debug {
-		log.Println("Stats Endpoint")
-	}
-
-	// then we can enable our stats endpoint
-	// we can maybe use prometheus to see our conversation metrics go nuts!
-	go actor.StatsEndpoint()
-
-	done := make(chan bool, 1)
-	go actor.HandleTerm(done)
-	<-done
-	if actor.Debug {
-		log.Println("After Done!")
+		log.Println("Done!")
 	}
 }

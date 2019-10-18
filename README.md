@@ -16,17 +16,6 @@ Actors only address other actors they have words for, but they can reply to anyo
 
 All of our actors get a conversation type, and each type defines a simple disposition.
 
-type Exchange struct {
-  Sent string
-  Recieved string
-}
-
-```
-type Conversation struct {
-  Greeting []Exchange //
-  Compliment []Exchange
-}
-
 ## Log / Output Commands for demo
 
 k logs -l "serving.knative.dev/service=frank" -n work-conversation --all-containers
@@ -35,3 +24,5 @@ k describe containersource.sources.eventing.knative.dev -n work-conversation
 
 # Message containersource output
 k logs -l actor=frank -n work-conversation
+
+## Third component
