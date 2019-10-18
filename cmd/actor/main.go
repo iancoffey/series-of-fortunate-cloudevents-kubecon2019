@@ -72,7 +72,7 @@ func main() {
 	time.Sleep(wakeUpDelay)
 
 	// A one-time GC run per actor is fine
-	a.GarbageCollect()
+	actor.GarbageCollect()
 
 	// first our actor starts Listening
 	go c.StartReceiver(ctx, actor.GotMessage)

@@ -192,9 +192,7 @@ func (a *Actor) TickMessages() {
 			case <-done:
 				return
 			case <-ticker.C:
-				if a.Debug {
-					log.Println("Ticking a message")
-				}
+				a.GarbageCollect()
 				if len(a.actors) == 0 {
 					continue
 				}
@@ -230,6 +228,10 @@ func (a *Actor) GarbageCollect() {
 	if err != nil {
 		log.Printf("Error during GC: %q", err)
 		return
+	}
+
+	if a.Debug {
+		log.Println("garbage collection item list count: %d", len(list.Items))
 	}
 
 	for _, cs := range list.Items {
