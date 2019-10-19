@@ -34,7 +34,7 @@ const (
 
 var (
 	// Basically, how often to speak up
-	interjectInConvoRate = 30 * time.Second
+	interjectInConvoRate = 10 * time.Second
 	// Our own little chaos monkey
 	maxLifeTime = time.Duration(rand.Intn(240)) * time.Second
 )
@@ -125,6 +125,25 @@ func (a *Actor) SpeakToAll(eventType, mood string, e Exchange) error {
 	return err
 }
 
+//func (a *Actor) actorDNSResolved(actor, namespace string) (bool, error) {
+//	// Its ok if DNS isnt resolved yet, but we want to do smart things about it.
+//	// This is the world of eventual consistency.
+//	hosts, err := net.LookupHost(fmt.Sprintf("%s.%s.svc.cluster.local", actor, namespace))
+//	if err != nil {
+//		if _, ok := err.(*net.DNSError); ok {
+//			return false, nil
+//		}
+//		return false, err
+//	}
+//
+//	// Ensure we have a host resolved
+//	if len(hosts) > 0 {
+//		return true, nil
+//	}
+//
+//	return false, nil
+//}
+
 func (a *Actor) StatsEndpoint() {
 }
 
@@ -155,26 +174,27 @@ func (a *Actor) AddToFriends(name string) {
 
 func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	if a.Debug {
-		log.Printf("Got message ID %s Source %s Subject %s\n", event.ID(), event.Source(), event.Subject())
+		// TODO: convert to k/v logging
+		log.Printf("Message ID %s Source %s Subject %s", event.ID(), event.Source(), event.Subject())
 	}
-	// We dont need to be talking to ourselves
+	// We want to avoid talking to ourselves
 	if event.Source() == a.Name {
 		return nil
 	}
-
-	// Lets add this actor to our list
+	// Lets add this actor to our friends list!
 	a.AddToFriends(event.Source())
 
 	if a.Debug {
 		log.Printf("Friends List -> %s", a.actors)
 	}
-
+	// Create our event Payload
 	payload := &EventPayload{}
 	if err := event.DataAs(&payload); err != nil {
 		log.Printf("Got Data Error: %s\n", err.Error())
 		return err
 	}
 
+	// Finally, the end result, lets speak in channel
 	log.Printf("conversation-> (%s) %s said %s", a.Name, payload.Message, event.Source())
 
 	return nil
@@ -196,10 +216,24 @@ func (a *Actor) TickMessages() {
 				if len(a.actors) == 0 {
 					continue
 				}
-				if err := a.SpeakToActor(MessageEventType, ConversationType, a.ConversationMessage()); err != nil {
-					return
-				}
 
+				switch {
+				case a.Asleep:
+					if err := a.SpeakToAll(MessageEventType, AsleepType, a.AsleepMessage()); err != nil {
+						log.Printf("at=TickMessages mood=asleep error=%q", err)
+						continue
+					}
+				case a.Angry:
+					if err := a.SpeakToAll(MessageEventType, AngryType, a.AngryMessage()); err != nil {
+						log.Printf("at=TickMessages mood=angry error=%q", err)
+						continue
+					}
+				default:
+					if err := a.SpeakToAll(MessageEventType, ConversationType, a.ConversationMessage()); err != nil {
+						log.Printf("at=TickMessages mood=conversation error=%q", err)
+						continue
+					}
+				}
 			}
 		}
 	}()
@@ -231,7 +265,7 @@ func (a *Actor) GarbageCollect() {
 	}
 
 	if a.Debug {
-		log.Println("garbage collection item list count: %d", len(list.Items))
+		log.Printf("garbage collection item list count: %d", len(list.Items))
 	}
 
 	for _, cs := range list.Items {

@@ -71,10 +71,10 @@ func main() {
 	// We need to pause a sec and let everything settle
 	time.Sleep(wakeUpDelay)
 
-	// A one-time GC run per actor is fine
+	// Quick gc on the way upto ensure the lane is open
 	actor.GarbageCollect()
 
-	// first our actor starts Listening
+	// First our actor starts Listening
 	go c.StartReceiver(ctx, actor.GotMessage)
 
 	// now we can introduce ourselves, and everyone can start to figure out our mood
