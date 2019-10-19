@@ -194,7 +194,9 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 		return err
 	}
 
-	// Finally, the end result, lets speak in channel
+	// Log the raw cloudevent output so we can zoom in on them
+	log.Printf("cloudevent-> \n%s\n", event)
+	// Finally, the end result, lets speak in channel!
 	log.Printf("conversation-> (%s) %s said %s", a.Name, payload.Message, event.Source())
 
 	return nil
