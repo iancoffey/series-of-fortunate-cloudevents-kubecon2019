@@ -82,11 +82,6 @@ func main() {
 		log.Fatalf("%s had a problem introducing themself! err=%q", err)
 	}
 
-	//go actor.StatsEndpoint()
-
-	//	done := make(chan bool, 1)
-	//	go actor.HandleTerm(done)
-	//	<-done
 	// then we can start our conversation Ticker
 	actor.TickMessages()
 	if actor.Debug {

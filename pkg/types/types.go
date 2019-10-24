@@ -29,7 +29,11 @@ const (
 	AsleepType       = "message.asleep"
 	AngryType        = "message.angry"
 
-	// Rate at which we want to break the silence
+	AngryMood  = "angry"
+	AsleepMood = "asleep"
+	NormalMood = "normal"
+
+	moodExtension = "mood"
 )
 
 var (
@@ -46,8 +50,7 @@ type Actor struct {
 	StatsListenPort uint16 `env:"STATS_PORT,default=8082"`
 	ConvoBroker     string `env:"CONVO_BROKER,default=conversation-broker"`
 	Greeting        string `env:"GREETING,default=hello"`
-	Asleep          bool   `env:"ASLEEP,default=false"`
-	Angry           bool   `env:"ANGRY,default=false"`
+	Mood            string `env:"MOOD,default=normal"`
 	Debug           bool   `env:"DEBUG,default=false"`
 	Namespace       string `env:"NAMESPACE,default=work-conversation"`
 	MessageImage    string `env:"MESSAGE_IMAGE,default=iancoffey/conversation-message:latest"`
@@ -57,6 +60,7 @@ type Actor struct {
 
 	Conversation Conversation
 	actors       []string // list of this actors friends names
+	messageIDs   []string // UUID of messages we have already gotten
 }
 
 // The exchange described both what it would send in this context and what it will respond with when necessary!
@@ -67,8 +71,8 @@ type Exchange struct {
 }
 
 type EventPayload struct {
-	Message string `json:"Message"`
-	Off     bool   `json:"OFF,default=false"`
+	Message string `json:"message"`
+	Shiny   bool   `json:"shiny,default=false"`
 }
 
 // Standard topic types, which map directly to CloudEvent Type
@@ -98,25 +102,53 @@ func (a *Actor) AngryMessage() Exchange {
 func (a *Actor) GoodbyeMessage() Exchange {
 	return a.Conversation.Goodbye[rand.Intn(len(a.Conversation.Goodbye))]
 }
-func (a *Actor) ConversationMessage() Exchange {
-	return a.Conversation.Conversation[rand.Intn(len(a.Conversation.Conversation))]
+func (a *Actor) ConversationMessage() (string, Exchange) {
+	switch a.Mood {
+	case AsleepMood:
+		return AsleepType, a.AsleepMessage()
+	case AngryMood:
+		return AngryType, a.AngryMessage()
+	}
+
+	return ConversationType, a.Conversation.Conversation[rand.Intn(len(a.Conversation.Conversation))]
 }
 
-func (a *Actor) Introduction() error {
-	switch {
-	case a.Asleep:
-		if err := a.SpeakToAll(MessageEventType, AsleepType, a.AsleepMessage()); err != nil {
-			return err
-		}
-	case a.Angry:
-		if err := a.SpeakToAll(MessageEventType, AngryType, a.AngryMessage()); err != nil {
-			return err
-		}
-	default:
-		if err := a.SpeakToAll(MessageEventType, HelloType, a.HelloMessage()); err != nil {
-			return err
-		}
+func (a *Actor) ReplyMessage(mood string) (string, Exchange) {
+	// We cant event interact if we are asleep!
+	switch a.Mood {
+	case AsleepMood:
+		return AsleepType, a.AsleepMessage()
 	}
+
+	// lets respond, considering their mood
+	switch mood {
+	case AsleepMood:
+		return AsleepType, a.AsleepMessage()
+	case AngryMood:
+		return AngryType, a.AngryMessage()
+	}
+	return a.ConversationMessage()
+}
+
+func (a *Actor) IntroMessage() (string, Exchange) {
+	switch a.Mood {
+	case AsleepMood:
+		return AsleepType, a.AsleepMessage()
+	case AngryMood:
+		return AngryType, a.AngryMessage()
+	}
+	return HelloType, a.HelloMessage()
+}
+
+// Just being awake doesnt mean the actor will behave how we want them to.
+// Their mood dictates their message style. Angry folks are always angry,
+// sleepy actors are always sleepy.
+func (a *Actor) Introduction() error {
+	introType, introMessage := a.IntroMessage()
+	if err := a.SpeakToAll(MessageEventType, introType, introMessage); err != nil {
+		return err
+	}
+
 	return nil
 }
 func (a *Actor) SpeakToAll(eventType, mood string, e Exchange) error {
@@ -148,11 +180,10 @@ func (a *Actor) StatsEndpoint() {
 }
 
 // Speak to random actor you have heard from
-func (a *Actor) SpeakToActor(eventType, mood string, e Exchange) error {
+func (a *Actor) SpeakToActor(eventType, mood, target string, e Exchange) error {
 	if len(a.actors) == 0 {
 		return errors.New("This actor has no friends! And you shouldnt be here.")
 	}
-	target := a.actors[rand.Intn(len(a.actors))]
 
 	cs := a.ContainerSource(eventType, target, e.Output, mood)
 	_, err := a.EventingClient.SourcesV1alpha1().ContainerSources(a.Namespace).Create(cs)
@@ -172,6 +203,15 @@ func (a *Actor) AddToFriends(name string) {
 	}
 }
 
+func (a *Actor) IsDuplicate(event cloudevents.Event) bool {
+	for _, id := range a.messageIDs {
+		if id == event.ID() {
+			return true
+		}
+	}
+	return false
+}
+
 func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	if a.Debug {
 		// TODO: convert to k/v logging
@@ -187,18 +227,43 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	if a.Debug {
 		log.Printf("Friends List -> %s", a.actors)
 	}
+
+	// We wont handle duplicate events!
+	if a.IsDuplicate(event) {
+		if a.Debug {
+			log.Printf("Duplicate event %s", event.ID())
+		}
+		return nil
+	}
+	// We want to remember what IDs we have seen!
+	a.messageIDs = append(a.messageIDs, event.ID())
+
 	// Create our event Payload
 	payload := &EventPayload{}
 	if err := event.DataAs(&payload); err != nil {
-		log.Printf("Got Data Error: %s\n", err.Error())
-		return err
+		log.Printf("Got Data Error: %s", err)
+		return nil
 	}
 
 	// Log the raw cloudevent output so we can zoom in on them
 	log.Printf("cloudevent-> \n%s\n", event)
-	// Finally, the end result, lets speak in channel!
-	log.Printf("conversation-> (%s) %s said %s", a.Name, payload.Message, event.Source())
 
+	// Record the message to our convo dialog stream
+	log.Printf("conversation-> (%s) %s said %s\n", a.Name, payload.Message, event.Source())
+
+	var mood string
+	err := event.ExtensionAs(moodExtension, &mood)
+	if err != nil {
+		log.Printf("mood extension error error=%q", err)
+		return nil
+	}
+	// Lets reply as well
+	// Our actor will respond with a similar types message - unless they are angry or asleep of course
+	replyType, replyMessage := a.ReplyMessage(mood)
+	if err := a.SpeakToActor(MessageEventType, replyType, event.Source(), replyMessage); err != nil {
+		log.Printf("SpeakToActor Error: %s", err)
+		return nil
+	}
 	return nil
 }
 
@@ -219,22 +284,10 @@ func (a *Actor) TickMessages() {
 					continue
 				}
 
-				switch {
-				case a.Asleep:
-					if err := a.SpeakToAll(MessageEventType, AsleepType, a.AsleepMessage()); err != nil {
-						log.Printf("at=TickMessages mood=asleep error=%q", err)
-						continue
-					}
-				case a.Angry:
-					if err := a.SpeakToAll(MessageEventType, AngryType, a.AngryMessage()); err != nil {
-						log.Printf("at=TickMessages mood=angry error=%q", err)
-						continue
-					}
-				default:
-					if err := a.SpeakToAll(MessageEventType, ConversationType, a.ConversationMessage()); err != nil {
-						log.Printf("at=TickMessages mood=conversation error=%q", err)
-						continue
-					}
+				convoType, convoMessage := a.ConversationMessage()
+				if err := a.SpeakToAll(MessageEventType, convoType, convoMessage); err != nil {
+					log.Printf("at=TickMessages mood=conversation error=%q", err)
+					continue
 				}
 			}
 		}

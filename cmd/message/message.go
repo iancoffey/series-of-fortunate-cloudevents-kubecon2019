@@ -11,7 +11,7 @@ import (
 	"github.com/joeshaw/envdecode"
 )
 
-const moodExtension = "mood-ext"
+const moodExtension = "mood"
 
 // We will get the broker sink address from the containersource reconciler.
 // Those reconcilers are super useful to our CloudEvent Conversation!
@@ -28,6 +28,8 @@ type Config struct {
 	Message string `env:"MESSAGE"`
 	// Mood to set the Extension to
 	Mood string `env:"MOOD"`
+	// Convey the power of the shiny object?
+	Shiny bool `env:"SHINY"`
 }
 
 func main() {
@@ -48,6 +50,7 @@ func main() {
 	}
 	payload := convoTypes.EventPayload{
 		Message: cfg.Message,
+		Shiny:   cfg.Shiny,
 	}
 
 	event := cloudevents.Event{

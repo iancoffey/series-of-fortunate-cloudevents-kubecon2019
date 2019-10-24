@@ -5,18 +5,30 @@
         {
           "output": "heyo",
           "input": "nice to see you"
+        },
+        {
+          "output": "whats crackin",
+          "input": "hey how are you today?"
         }
       ],
       "goodbye": [
         {
           "output": "ight im out",
           "input": "ttyl"
+        },
+        {
+          "output": "im leaving now",
+          "input": "later skater"
         }
       ],
       "conversation": [
         {
           "output": "I love to fish!",
           "input": "Oh you dont say?"
+        },
+        {
+          "output": "what glorious weather",
+          "input": "I think you are saying interesting stuff"
         }
       ],
       "asleep": [
@@ -29,6 +41,10 @@
         {
           "output": "IM SO MAD",
           "input": "wow chill"
+        },
+        {
+          "output": "Im TOO ANGRY to talk right now",
+          "input": "wow this person is ready to FIGHT yall"
         }
       ]
     },
@@ -37,18 +53,30 @@
         {
           "output": "hello",
           "input": "how do you do"
+        },
+        {
+          "output": "nice to meet yall",
+          "input": "very good to meet you as well"
         }
       ],
       "goodbye": [
         {
           "output": "cya",
           "input": "ok bye then"
+        },
+        {
+          "output": "im peacing out",
+          "input": "catch you on the flip side!"
         }
       ],
       "conversation": [
         {
           "output": "you say the weirdest stuff",
           "input": "And you dont?"
+        },
+        {
+          "output": "do you ever feel like you are beign watched?",
+          "input": "of course, all the time"
         }
       ],
       "asleep": [
@@ -61,7 +89,12 @@
         {
           "output": "AHHHHHH ANGRY AHHH",
           "input": "oh you want trouble?"
+        },
+        {
+          "output": "Monster Smash! SO MAD",
+          "input": "You better treat me with respect, buster!"
         }
+
       ]
     },
     {
@@ -69,18 +102,30 @@
         {
           "output": "here I am everyone",
           "input": "yes you made it!"
+        },
+        {
+          "output": "I have arrived!",
+          "input": "oh so exciting you are here"
         }
       ],
       "goodbye": [
         {
           "output": "time to jet",
           "input": "cyaaaa"
+        },
+        {
+          "output": "im leaving everyone!",
+          "input": "bye bye friend"
         }
       ],
       "conversation": [
         {
           "output": "This is getting a little boring",
           "input": "Thats just rude"
+        },
+        {
+          "output": "What a wild time to be an application!",
+          "input": "Everything seems exciting today"
         }
       ],
       "asleep": [
@@ -93,6 +138,10 @@
         {
           "output": "oh i just dont know how to control my rage",
           "input": "holy macaroni calm down"
+        },
+        {
+          "output": "im MAD and I cant HIDE IT",
+          "input": "you are too loud! and wild!"
         }
       ]
     }

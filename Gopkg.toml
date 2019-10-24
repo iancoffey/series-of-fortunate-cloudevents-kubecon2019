@@ -1,13 +1,18 @@
 required = [
-#  "github.com/cloudevents/sdk-go/pkg/cloudevents",
-#  "github.com/cloudevents/sdk-go/pkg/cloudevents/types",
-#  "github.com/joeshaw/envdecode"
+  "github.com/cloudevents/sdk-go/pkg/cloudevents",
+  "github.com/cloudevents/sdk-go/pkg/cloudevents/types",
+  "github.com/joeshaw/envdecode",
   "gopkg.in/fsnotify.v1",
 ]
 
 [[constraint]]
   source = "https://github.com/fsnotify/fsnotify/archive/v1.4.7.tar.gz"
   name = "gopkg.in/fsnotify.v1"
+
+# b0ed3376c113528ca45911a44eac70307912b318
+#[[override]]
+#  name = "github.com/cloudevents/sdk-go"
+#  version = "0.10.0"
 
 [prune]
   go-tests = true

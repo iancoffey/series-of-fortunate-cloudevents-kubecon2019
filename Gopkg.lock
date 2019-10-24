@@ -99,11 +99,16 @@
   digest = "1:a7a700de9b6ff612628703167b7583163492d4b93a5713c981a3bde9b0228519"
   name = "github.com/cloudevents/sdk-go"
   packages = [
+    ".",
     "pkg/cloudevents",
+    "pkg/cloudevents/client",
+    "pkg/cloudevents/context",
     "pkg/cloudevents/datacodec",
     "pkg/cloudevents/datacodec/json",
     "pkg/cloudevents/datacodec/xml",
     "pkg/cloudevents/observability",
+    "pkg/cloudevents/transport",
+    "pkg/cloudevents/transport/http",
     "pkg/cloudevents/types",
   ]
   pruneopts = "T"
@@ -286,14 +291,6 @@
   pruneopts = "T"
   revision = "27518f6661eba504be5a7a9a9f6d9460d892ade3"
   version = "v1.1.7"
-
-[[projects]]
-  digest = "1:dfc3f47216be6810206419ac72f2e9ba217151d79d3106d6542f73df311a5fa2"
-  name = "github.com/knative/eventing"
-  packages = ["pkg/apis/eventing/v1alpha1"]
-  pruneopts = "T"
-  revision = "a1a098150e5b624573c391563cd13f1703dcc10d"
-  version = "v0.9.0"
 
 [[projects]]
   digest = "1:3804a3a02964db8e6db3e5e7960ac1c1a9b12835642dd4f4ac4e56c749ec73eb"
@@ -1018,6 +1015,11 @@
     "pkg/apis/messaging/v1alpha1",
     "pkg/apis/sources",
     "pkg/apis/sources/v1alpha1",
+    "pkg/client/clientset/versioned",
+    "pkg/client/clientset/versioned/scheme",
+    "pkg/client/clientset/versioned/typed/eventing/v1alpha1",
+    "pkg/client/clientset/versioned/typed/messaging/v1alpha1",
+    "pkg/client/clientset/versioned/typed/sources/v1alpha1",
   ]
   pruneopts = "T"
   revision = "a1a098150e5b624573c391563cd13f1703dcc10d"
@@ -1089,14 +1091,19 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/cloudevents/sdk-go",
     "github.com/cloudevents/sdk-go/pkg/cloudevents",
     "github.com/cloudevents/sdk-go/pkg/cloudevents/types",
+    "github.com/google/uuid",
     "github.com/joeshaw/envdecode",
-    "github.com/knative/eventing/pkg/apis/eventing/v1alpha1",
     "gopkg.in/fsnotify.v1",
+    "k8s.io/api/core/v1",
+    "k8s.io/apimachinery/pkg/apis/meta/v1",
+    "k8s.io/apimachinery/pkg/labels",
     "k8s.io/client-go/plugin/pkg/client/auth/gcp",
-    "knative.dev/eventing/pkg/apis/eventing/v1alpha1",
+    "k8s.io/client-go/rest",
     "knative.dev/eventing/pkg/apis/sources/v1alpha1",
+    "knative.dev/eventing/pkg/client/clientset/versioned",
     "sigs.k8s.io/controller-runtime/pkg/client/config",
     "sigs.k8s.io/controller-runtime/pkg/manager",
     "sigs.k8s.io/controller-runtime/pkg/runtime/log",
