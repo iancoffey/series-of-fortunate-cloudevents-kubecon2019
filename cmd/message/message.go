@@ -11,8 +11,6 @@ import (
 	"github.com/joeshaw/envdecode"
 )
 
-const moodExtension = "mood"
-
 // We will get the broker sink address from the containersource reconciler.
 // Those reconcilers are super useful to our CloudEvent Conversation!
 type Config struct {
