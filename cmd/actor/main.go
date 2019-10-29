@@ -28,7 +28,7 @@ const (
 
 func main() {
 	ctx := context.Background()
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UTC().UnixNano())
 
 	var actor types.Actor
 	err := envdecode.StrictDecode(&actor)
@@ -77,7 +77,7 @@ func main() {
 	// First our actor starts Listening
 	go c.StartReceiver(ctx, actor.GotMessage)
 
-	// now we can introduce ourselves, and everyone can start to figure out our mood
+	// now we can introduce ourselves
 	if err := actor.Introduction(); err != nil {
 		log.Fatalf("%s had a problem introducing themself! err=%q", err)
 	}

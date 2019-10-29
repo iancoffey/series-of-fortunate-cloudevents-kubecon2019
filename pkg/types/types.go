@@ -21,19 +21,6 @@ const (
 
 	// ohhh fun. lets cast this last and put everyone to sleep
 	SleepSpellEventType = "com.iancoffey.conversation.sleepspell"
-
-	// Here we have the moods our actors will find themselves in
-	HelloType        = "message.hello"
-	GoodnightType    = "message.goodbye"
-	ConversationType = "message.conversation"
-	AsleepType       = "message.asleep"
-	AngryType        = "message.angry"
-
-	AngryMood  = "angry"
-	AsleepMood = "asleep"
-	NormalMood = "normal"
-
-	moodExtension = "mood"
 )
 
 var (
@@ -49,8 +36,6 @@ type Actor struct {
 	ConvoListenPort uint16 `env:"PORT,default=8080"`
 	StatsListenPort uint16 `env:"STATS_PORT,default=8082"`
 	ConvoBroker     string `env:"CONVO_BROKER,default=conversation-broker"`
-	Greeting        string `env:"GREETING,default=hello"`
-	Mood            string `env:"MOOD,default=normal"`
 	Debug           bool   `env:"DEBUG,default=false"`
 	Namespace       string `env:"NAMESPACE,default=work-conversation"`
 	MessageImage    string `env:"MESSAGE_IMAGE,default=iancoffey/conversation-message:latest"`
@@ -61,6 +46,7 @@ type Actor struct {
 	Conversation Conversation
 	actors       []string // list of this actors friends names
 	messageIDs   []string // UUID of messages we have already gotten
+	entranced    bool
 }
 
 // The exchange described both what it would send in this context and what it will respond with when necessary!
@@ -80,112 +66,60 @@ type EventPayload struct {
 // "Unix" mode = "hello = EHLO, Angry = OOMKILLER Message"
 type Conversation struct {
 	Hello        []Exchange `json:"hello,omitempty"`        // either sending or being sent hello
-	Goodbye      []Exchange `json:"goodbye,omitempty"`      // if we need to send or get sent Goodbye messages
 	Conversation []Exchange `json:"conversation,omitempty"` // Once running, a ticker will just schedule Convos every N seconds
-	Asleep       []Exchange `json:"asleep,omitempty"`       // zzzz
-	Angry        []Exchange `json:"angry,omitempty"`        // enable angry mode, which replies and responds only with angry stuff
+	Shiny        []Exchange `json:"shiny,omitempty"`        // shiny objects!
 }
 
 type ConversationManifests struct {
 	Conversations []Conversation `json:"conversations,omitempty"`
 }
 
-func (a *Actor) AsleepMessage() Exchange {
-	return a.Conversation.Asleep[rand.Intn(len(a.Conversation.Asleep))]
-}
 func (a *Actor) HelloMessage() Exchange {
 	return a.Conversation.Hello[rand.Intn(len(a.Conversation.Hello))]
 }
-func (a *Actor) AngryMessage() Exchange {
-	return a.Conversation.Angry[rand.Intn(len(a.Conversation.Angry))]
+func (a *Actor) ShinyMessage() Exchange {
+	return a.Conversation.Shiny[rand.Intn(len(a.Conversation.Shiny))]
 }
-func (a *Actor) GoodbyeMessage() Exchange {
-	return a.Conversation.Goodbye[rand.Intn(len(a.Conversation.Goodbye))]
-}
-func (a *Actor) ConversationMessage() (string, Exchange) {
-	switch a.Mood {
-	case AsleepMood:
-		return AsleepType, a.AsleepMessage()
-	case AngryMood:
-		return AngryType, a.AngryMessage()
+
+func (a *Actor) ConversationMessage() Exchange {
+	switch {
+	case a.entranced:
+		return a.ShinyMessage()
 	}
 
-	return ConversationType, a.Conversation.Conversation[rand.Intn(len(a.Conversation.Conversation))]
+	return a.Conversation.Conversation[rand.Intn(len(a.Conversation.Conversation))]
 }
 
-func (a *Actor) ReplyMessage(mood string) (string, Exchange) {
-	// We cant event interact if we are asleep!
-	switch a.Mood {
-	case AsleepMood:
-		return AsleepType, a.AsleepMessage()
+func (a *Actor) IntroMessage() Exchange {
+	switch {
+	case a.entranced:
+		return a.ShinyMessage()
 	}
 
-	// lets respond, considering their mood
-	switch mood {
-	case AsleepMood:
-		return AsleepType, a.AsleepMessage()
-	case AngryMood:
-		return AngryType, a.AngryMessage()
-	}
-	return a.ConversationMessage()
+	return a.HelloMessage()
 }
 
-func (a *Actor) IntroMessage() (string, Exchange) {
-	switch a.Mood {
-	case AsleepMood:
-		return AsleepType, a.AsleepMessage()
-	case AngryMood:
-		return AngryType, a.AngryMessage()
-	}
-	return HelloType, a.HelloMessage()
-}
-
-// Just being awake doesnt mean the actor will behave how we want them to.
-// Their mood dictates their message style. Angry folks are always angry,
-// sleepy actors are always sleepy.
+// Just being awake doesnt mean the actor will behave how we want them to :(
 func (a *Actor) Introduction() error {
-	introType, introMessage := a.IntroMessage()
-	if err := a.SpeakToAll(MessageEventType, introType, introMessage); err != nil {
+	if err := a.SpeakToAll(MessageEventType, a.IntroMessage()); err != nil {
 		return err
 	}
 
 	return nil
 }
-func (a *Actor) SpeakToAll(eventType, mood string, e Exchange) error {
-	cs := a.ContainerSource(eventType, "all", e.Output, mood)
+func (a *Actor) SpeakToAll(eventType string, e Exchange) error {
+	cs := a.ContainerSource(eventType, "all", e.Output)
 	_, err := a.EventingClient.SourcesV1alpha1().ContainerSources(a.Namespace).Create(cs)
 	return err
 }
 
-//func (a *Actor) actorDNSResolved(actor, namespace string) (bool, error) {
-//	// Its ok if DNS isnt resolved yet, but we want to do smart things about it.
-//	// This is the world of eventual consistency.
-//	hosts, err := net.LookupHost(fmt.Sprintf("%s.%s.svc.cluster.local", actor, namespace))
-//	if err != nil {
-//		if _, ok := err.(*net.DNSError); ok {
-//			return false, nil
-//		}
-//		return false, err
-//	}
-//
-//	// Ensure we have a host resolved
-//	if len(hosts) > 0 {
-//		return true, nil
-//	}
-//
-//	return false, nil
-//}
-
-func (a *Actor) StatsEndpoint() {
-}
-
 // Speak to random actor you have heard from
-func (a *Actor) SpeakToActor(eventType, mood, target string, e Exchange) error {
+func (a *Actor) SpeakToActor(eventType, target string, e Exchange) error {
 	if len(a.actors) == 0 {
 		return errors.New("This actor has no friends! And you shouldnt be here.")
 	}
 
-	cs := a.ContainerSource(eventType, target, e.Output, mood)
+	cs := a.ContainerSource(eventType, target, e.Output)
 	_, err := a.EventingClient.SourcesV1alpha1().ContainerSources(a.Namespace).Create(cs)
 	return err
 }
@@ -221,6 +155,21 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	if event.Source() == a.Name {
 		return nil
 	}
+
+	// Warning: Our actors may become entranced by shiny objects!
+	if event.Type() == SleepSpellEventType {
+		log.Printf("conversation-> (%s) has become distracted by a shiny object thrown by!\n", a.Name, event.Source())
+
+		a.entranced = true
+		return nil
+	}
+	if a.entranced {
+		if err := a.SpeakToActor(SleepSpellEventType, event.Source(), a.ShinyMessage()); err != nil {
+			log.Printf("SpeakToActor Error: %s", err)
+			return nil
+		}
+	}
+
 	// Lets add this actor to our friends list!
 	a.AddToFriends(event.Source())
 
@@ -251,16 +200,9 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	// Record the message to our convo dialog stream
 	log.Printf("conversation-> (%s) %s said %s\n", a.Name, payload.Message, event.Source())
 
-	var mood string
-	err := event.ExtensionAs(moodExtension, &mood)
-	if err != nil {
-		log.Printf("mood extension error error=%q", err)
-		return nil
-	}
 	// Lets reply as well
 	// Our actor will respond with a similar types message - unless they are angry or asleep of course
-	replyType, replyMessage := a.ReplyMessage(mood)
-	if err := a.SpeakToActor(MessageEventType, replyType, event.Source(), replyMessage); err != nil {
+	if err := a.SpeakToActor(MessageEventType, event.Source(), a.ConversationMessage()); err != nil {
 		log.Printf("SpeakToActor Error: %s", err)
 		return nil
 	}
@@ -284,9 +226,8 @@ func (a *Actor) TickMessages() {
 					continue
 				}
 
-				convoType, convoMessage := a.ConversationMessage()
-				if err := a.SpeakToAll(MessageEventType, convoType, convoMessage); err != nil {
-					log.Printf("at=TickMessages mood=conversation error=%q", err)
+				if err := a.SpeakToAll(MessageEventType, a.ConversationMessage()); err != nil {
+					log.Printf("at=TickMessages error=%q", err)
 					continue
 				}
 			}
@@ -340,9 +281,9 @@ func (a *Actor) GarbageCollect() {
 	}
 }
 
-func (a *Actor) ContainerSource(eventType, recipientName, message, mood string) *sourcesv1.ContainerSource {
+func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourcesv1.ContainerSource {
 	if a.Debug {
-		log.Printf("ContainerSource type:%s receipient: message:%s mood:%s", eventType, recipientName, message, mood)
+		log.Printf("ContainerSource type:%s receipient: message:%s entanced:%s", eventType, recipientName, message, a.entranced)
 	}
 
 	labels := make(map[string]string)
@@ -382,10 +323,6 @@ func (a *Actor) ContainerSource(eventType, recipientName, message, mood string) 
 									Name:  "MESSAGE",
 									Value: message,
 								},
-								{
-									Name:  "MOOD",
-									Value: mood,
-								},
 							},
 						},
 					},
@@ -401,14 +338,19 @@ func (a *Actor) ContainerSource(eventType, recipientName, message, mood string) 
 	}
 }
 
-// on Term or Int, send everyone Goodbye!
-//func (a *Actor) HandleTerm(done chan<- bool) {
-//	sigs := make(chan os.Signal, 1)
-
-//	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-//	go func() {
-//		<-sigs
-//		a.SpeakToAll(MessageEventType, GoodnightType, a.GoodbyeMessage())
-//		done <- true
-//	}()
+//func (a *Actor) actorDNSResolved(actor, namespace string) (bool, error) {
+//	hosts, err := net.LookupHost(fmt.Sprintf("%s.%s.svc.cluster.local", actor, namespace))
+//	if err != nil {
+//		if _, ok := err.(*net.DNSError); ok {
+//			return false, nil
+//		}
+//		return false, err
+//	}
+//
+//	// Ensure we have a host resolved
+//	if len(hosts) > 0 {
+//		return true, nil
+//	}
+//
+//	return false, nil
 //}

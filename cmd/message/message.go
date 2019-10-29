@@ -26,8 +26,6 @@ type Config struct {
 	RecipientName string `env:"RECIPIENT_NAME"`
 	// Message we are sending
 	Message string `env:"MESSAGE"`
-	// Mood to set the Extension to
-	Mood string `env:"MOOD"`
 	// Convey the power of the shiny object?
 	Shiny bool `env:"SHINY"`
 }
@@ -62,7 +60,6 @@ func main() {
 		}.AsV03(),
 		Data: payload,
 	}
-	event.SetExtension(moodExtension, cfg.Mood)
 
 	_, _, err = c.Send(context.Background(), event)
 	if err != nil {

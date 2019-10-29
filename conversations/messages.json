@@ -11,14 +11,14 @@
           "input": "hey how are you today?"
         }
       ],
-      "goodbye": [
+    "shiny": [
         {
-          "output": "ight im out",
-          "input": "ttyl"
+          "output": "shiny object!",
+          "input": "wow look it IS shiny"
         },
         {
-          "output": "im leaving now",
-          "input": "later skater"
+          "output": "hey look shiny shiny shiny shiny",
+          "input": "GLITTERY!!!!"
         }
       ],
       "conversation": [
@@ -29,15 +29,11 @@
         {
           "output": "what glorious weather",
           "input": "I think you are saying interesting stuff"
-        }
-      ],
-      "asleep": [
+        },
         {
           "output": "zzzzzzzz",
           "input": "night night!"
-        }
-      ],
-      "angry": [
+        },
         {
           "output": "IM SO MAD",
           "input": "wow chill"
@@ -59,14 +55,14 @@
           "input": "very good to meet you as well"
         }
       ],
-      "goodbye": [
+    "shiny": [
         {
-          "output": "cya",
-          "input": "ok bye then"
+          "output": "What were we saying? That thing is just so GLITTERY AND SHINY",
+          "input": "wow look it IS shiny"
         },
         {
-          "output": "im peacing out",
-          "input": "catch you on the flip side!"
+          "output": "I cant concentrate on anything but that glittery perfect object",
+          "input": "GLITTERY!!!!"
         }
       ],
       "conversation": [
@@ -75,17 +71,21 @@
           "input": "And you dont?"
         },
         {
-          "output": "do you ever feel like you are beign watched?",
+          "output": "do you ever feel like you are being watched?",
           "input": "of course, all the time"
-        }
-      ],
-      "asleep": [
+        },
+        {
+          "output": "cya",
+          "input": "ok bye then"
+        },
+        {
+          "output": "im peacing out",
+          "input": "catch you on the flip side!"
+        },
         {
           "output": "oops my bad",
           "input": "zzzzsnorezzzz"
-        }
-      ],
-      "angry": [
+        },
         {
           "output": "AHHHHHH ANGRY AHHH",
           "input": "oh you want trouble?"
@@ -108,17 +108,17 @@
           "input": "oh so exciting you are here"
         }
       ],
-      "goodbye": [
+    "shiny": [
         {
-          "output": "time to jet",
-          "input": "cyaaaa"
+          "output": "Super distracted by that weird glowing ball, what is that I cant look away",
+          "input": "wow look it IS shiny"
         },
         {
-          "output": "im leaving everyone!",
-          "input": "bye bye friend"
+          "output": "Its perfect! And it glitters. Amazing. Can we keep it?",
+          "input": "GLITTERY!!!!"
         }
       ],
-      "conversation": [
+    "conversation": [
         {
           "output": "This is getting a little boring",
           "input": "Thats just rude"
@@ -126,15 +126,19 @@
         {
           "output": "What a wild time to be an application!",
           "input": "Everything seems exciting today"
-        }
-      ],
-      "asleep": [
+        },
+        {
+          "output": "time to jet",
+          "input": "cyaaaa"
+        },
+        {
+          "output": "im leaving everyone!",
+          "input": "bye bye friend"
+        },
         {
           "output": "zzzzzzzz",
           "input": "night night!"
-        }
-      ],
-      "angry": [
+        },
         {
           "output": "oh i just dont know how to control my rage",
           "input": "holy macaroni calm down"
