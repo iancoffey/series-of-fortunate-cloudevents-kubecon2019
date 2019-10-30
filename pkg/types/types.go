@@ -229,7 +229,7 @@ func (a *Actor) TickMessages() {
 
 			//			continue
 			//		}
-
+			a.GarbageCollect(true)
 			if err := a.SpeakToAll(MessageEventType, a.ConversationMessage()); err != nil {
 				log.Printf("at=TickMessages error=%q", err)
 				continue
