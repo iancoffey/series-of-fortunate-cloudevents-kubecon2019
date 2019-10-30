@@ -18,20 +18,27 @@ mkdir -p manifests/people/$ACTOR_NAME
 echo "Creating $ACTOR_NAME Service"
 
 cat <<EOS > manifests/people/$ACTOR_NAME/service.yaml
-apiVersion: serving.knative.dev/v1alpha1
-kind: Service
+---
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: $ACTOR_NAME
   namespace: $NAMESPACE
 spec:
+  selector:
+    matchLabels:
+      actor: $ACTOR_NAME
+  replicas: 1
   template:
     metadata:
-      annotations:
-        autoscaling.knative.dev/minScale: "1"
+      labels:
+        actor: $ACTOR_NAME
     spec:
-      serviceAccountName: actor-account
       containers:
-      - image: $ACTOR_IMAGE
+      - name: speaker
+        image: $ACTOR_IMAGE
+        ports:
+        - containerPort: 8080
         env:
         - name: NAME
           value: $ACTOR_NAME
@@ -41,7 +48,20 @@ spec:
           value: $MESSAGE_IMAGE
         - name: DEBUG
           value: "TRUE"
-      timeoutSeconds: 600
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: $ACTOR_NAME
+  namespace: $NAMESPACE
+  labels:
+    actor: $ACTOR_NAME
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+  selector:
+    actor: $ACTOR_NAME
 EOS
 envsubst < manifests/people/$ACTOR_NAME/service.yaml | kubectl apply -f -
 
@@ -60,7 +80,7 @@ spec:
       subject: $ACTOR_NAME
   subscriber:
     ref:
-      apiVersion: serving.knative.dev/v1alpha1
+      apiVersion: v1
       kind: Service
       name: $ACTOR_NAME
 
@@ -78,7 +98,7 @@ spec:
       subject: all
   subscriber:
     ref:
-      apiVersion: serving.knative.dev/v1alpha1
+      apiVersion: v1
       kind: Service
       name: $ACTOR_NAME
 EOS
