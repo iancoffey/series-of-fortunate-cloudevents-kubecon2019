@@ -1,0 +1,20 @@
+#!/bin/sh
+
+PATH=$HOME/.gloo/bin:$PATH
+
+CLUSTER_NAME=conversations
+
+# create kind cluster
+kind create cluster --name="$CLUSTER_NAME"
+
+# Set kubeconfig
+export KUBECONFIG="$(kind get kubeconfig-path --name="$CLUSTER_NAME")"
+
+# Install knative
+glooctl install knative -e -k
+
+# apply manifests
+kubectl apply --kubeconfig="$KUBECONFIG" -f manifests/setup
+
+# ready for actors?
+echo "Done! Time to create some actors."

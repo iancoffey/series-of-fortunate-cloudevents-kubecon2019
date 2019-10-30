@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# ubuntu 19.04
+
+snap install go --classic
+
+apt install build-essential
+
+GO111MODULE="on" go get sigs.k8s.io/kind@v0.5.1
+
+cp go/bin/kind /usr/local/bin

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+kail -n work-conversation |grep 'conversation->'

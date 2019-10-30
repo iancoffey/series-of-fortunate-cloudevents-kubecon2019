@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export KO_DOCKER_REPO=iancoffey
+
+ko publish ./cmd/actor
+
+ko publish ./cmd/message

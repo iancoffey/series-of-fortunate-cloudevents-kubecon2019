@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Lets distract them with a powerful shiny object!
+
+source ./bin/config.sh
+
+export ACTOR_NAME=$1
+
+if [ -z $ACTOR_NAME ]
+then
+	echo "ACTOR_NAME not set, sending to all!"
+	ACTOR_NAME="all"
+fi
+
+mkdir -p manifests/people/$ACTOR_NAME
+
+cat <<EOS > manifests/people/$ACTOR_NAME/shiny.yaml
+apiVersion: sources.eventing.knative.dev/v1alpha1
+kind: ContainerSource
+metadata:
+  namespace: $NAMESPACE
+  name: $ACTOR_NAME
+spec:
+  template:
+    spec:
+      containers:
+        - image: $MESSAGE_IMAGE
+          name: $ACTOR_NAME-magic-spell-shiny
+          env:
+            - name: EVENT_TYPE
+              value: "com.iancoffey.conversation.sleepspell"
+            - name: SENDER_NAME
+              value: "architect"
+            - name: RECIPIENT_NAME
+              value: $ACTOR_NAME
+            - name: MESSAGE
+              value: "Behold! Something shiny."
+            - name: SHINY
+              value: "true"
+  sink:
+    apiVersion: serving.knative.dev/v1alpha1
+    kind: Service
+    name: $ACTOR_NAME
+EOS
+envsubst < manifests/people/$ACTOR_NAME/shiny.yaml | kubectl apply -f -
