@@ -19,7 +19,7 @@ const (
 	// Similarly, in our automated world, just existing in this namespace is enough for the actors to begin participating
 	heartBeatRate = 10 * time.Second
 	// Every so often its important to speak up in a conversation to ensure it stays interesting
-	interjectInConvoRate = 30 * time.Second
+	interjectInConvoRate = 5 * time.Second
 	// bind address
 	localBindAddress = "http://0.0.0.0:8080/"
 	// we need time for dns to start resolving
