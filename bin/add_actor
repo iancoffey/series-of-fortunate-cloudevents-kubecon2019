@@ -35,7 +35,6 @@ spec:
         actor: $ACTOR_NAME
     spec:
       serviceAccountName: actor-account
-      automountServiceAccountToken: false
       containers:
       - name: speaker
         image: $ACTOR_IMAGE
@@ -60,8 +59,9 @@ metadata:
     actor: $ACTOR_NAME
 spec:
   ports:
-  - port: 8080
+  - port: 80
     protocol: TCP
+    targetPort: 8080
   selector:
     actor: $ACTOR_NAME
 EOS
