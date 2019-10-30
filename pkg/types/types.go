@@ -221,7 +221,7 @@ func (a *Actor) TickMessages() {
 			case <-done:
 				return
 			case <-ticker.C:
-				a.GarbageCollect()
+				a.GarbageCollect(false)
 				if len(a.actors) == 0 {
 					continue
 				}
@@ -243,7 +243,7 @@ func (a *Actor) TickMessages() {
 	}
 }
 
-func (a *Actor) GarbageCollect() {
+func (a *Actor) GarbageCollect(force bool) {
 	if a.Debug {
 		log.Println("garbage collecting")
 	}
@@ -265,6 +265,14 @@ func (a *Actor) GarbageCollect() {
 	}
 
 	for _, cs := range list.Items {
+		if force {
+			err := a.EventingClient.SourcesV1alpha1().ContainerSources(a.Namespace).Delete(cs.Name, &metav1.DeleteOptions{})
+			if err != nil {
+				log.Printf("error deleting containersource %s: %q", cs.Name, err)
+				return
+			}
+		}
+
 		for _, cd := range cs.Status.Conditions {
 			if cd.Type == "Deployed" && cd.Status == "True" {
 				if a.Debug {

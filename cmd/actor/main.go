@@ -72,14 +72,14 @@ func main() {
 	time.Sleep(wakeUpDelay)
 
 	// Quick gc on the way upto ensure the lane is open
-	actor.GarbageCollect()
+	actor.GarbageCollect(true)
 
 	// First our actor starts Listening
 	go c.StartReceiver(ctx, actor.GotMessage)
 
 	// now we can introduce ourselves
 	if err := actor.Introduction(); err != nil {
-		log.Fatalf("%s had a problem introducing themself! err=%q", err)
+		log.Fatalf("%s had a problem introducing themself. err=%q", actor.Name, err)
 	}
 
 	// then we can start our conversation Ticker
