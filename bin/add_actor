@@ -34,6 +34,8 @@ spec:
       labels:
         actor: $ACTOR_NAME
     spec:
+      serviceAccountName: actor-account
+      automountServiceAccountToken: false
       containers:
       - name: speaker
         image: $ACTOR_IMAGE
