@@ -27,8 +27,8 @@ var (
 	// Basically, how often to speak up
 	interjectInConvoRate = 10 * time.Second
 	// Randomize the lifetime a bit
-	minLifeTime = 30
-	maxLifeTime = 60
+	minLifeTime = 600
+	maxLifeTime = 300
 )
 
 type Actor struct {

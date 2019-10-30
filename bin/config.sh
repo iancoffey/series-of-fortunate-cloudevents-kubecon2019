@@ -1,3 +1,3 @@
-export ACTOR_IMAGE="index.docker.io/iancoffey/actor-1bcccc7d9a5ff4724b951faf3b7f1cbf@sha256:970e518f00a637f479af7ca2eea595750f94e389a8db21911d803dc0f6993c0b"
-export MESSAGE_IMAGE="index.docker.io/iancoffey/message-17a224fa9e2b74d49f523049e2991d1c@sha256:00fbdfc1090ec382fd7e2a8576e6f3fc96c06fb0d8edd8b4e29c8a8591a98dc7"
+export ACTOR_IMAGE="index.docker.io/iancoffey/actor-1bcccc7d9a5ff4724b951faf3b7f1cbf@sha256:4f8f05ce490b7df9b024abafd3338faf8512336f13966e9da53d00b88a935748"
+export MESSAGE_IMAGE="index.docker.io/iancoffey/message-17a224fa9e2b74d49f523049e2991d1c@sha256:85cf3260981ef74b6a93ddbd264bcef4fda6800ec8bf4483b50c46e0ad2aa94b"
 export NAMESPACE="work-conversation"
