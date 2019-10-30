@@ -26,9 +26,6 @@ const (
 var (
 	// Basically, how often to speak up
 	interjectInConvoRate = 10 * time.Second
-	// Randomize the lifetime a bit
-	minLifeTime = 600
-	maxLifeTime = 300
 )
 
 type Actor struct {
@@ -219,28 +216,22 @@ func (a *Actor) TickMessages() {
 	ticker := time.NewTicker(interjectInConvoRate)
 	done := make(chan bool)
 
-	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case <-ticker.C:
-				a.GarbageCollect(false)
-				if len(a.actors) == 0 {
-					continue
-				}
+	for {
+		select {
+		case <-done:
+			return
+		case <-ticker.C:
+			a.GarbageCollect(false)
+			if len(a.actors) == 0 {
+				continue
+			}
 
-				if err := a.SpeakToAll(MessageEventType, a.ConversationMessage()); err != nil {
-					log.Printf("at=TickMessages error=%q", err)
-					continue
-				}
+			if err := a.SpeakToAll(MessageEventType, a.ConversationMessage()); err != nil {
+				log.Printf("at=TickMessages error=%q", err)
+				continue
 			}
 		}
-	}()
-
-	time.Sleep(time.Duration(rand.Intn(maxLifeTime-minLifeTime+1)) * time.Second)
-	ticker.Stop()
-	done <- true
+	}
 
 	if a.Debug {
 		log.Println("Exiting TickMessages")
