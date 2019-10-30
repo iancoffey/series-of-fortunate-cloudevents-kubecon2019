@@ -290,7 +290,7 @@ func (a *Actor) GarbageCollect(force bool) {
 
 func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourcesv1.ContainerSource {
 	if a.Debug {
-		log.Printf("ContainerSource type:%s receipient: message:%s entanced:%s", eventType, recipientName, message, a.entranced)
+		log.Printf("ContainerSource type: %s receipient: %s message: %s entranced: %s", eventType, recipientName, message, a.entranced)
 	}
 
 	labels := make(map[string]string)
