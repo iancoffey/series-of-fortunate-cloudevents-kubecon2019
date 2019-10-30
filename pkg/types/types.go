@@ -221,10 +221,14 @@ func (a *Actor) TickMessages() {
 		case <-done:
 			return
 		case <-ticker.C:
-			a.GarbageCollect(false)
-			if len(a.actors) == 0 {
-				continue
-			}
+			//	a.GarbageCollect(false)
+			//		if len(a.actors) == 0 {
+			//			if a.Debug {
+			//				log.Println("no actors for %s, no need to speak", actor.Name)
+			//			}
+
+			//			continue
+			//		}
 
 			if err := a.SpeakToAll(MessageEventType, a.ConversationMessage()); err != nil {
 				log.Printf("at=TickMessages error=%q", err)
