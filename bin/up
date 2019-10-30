@@ -11,7 +11,7 @@ kind create cluster --name="$CLUSTER_NAME"
 export KUBECONFIG="$(kind get kubeconfig-path --name="$CLUSTER_NAME")"
 
 # Install knative
-glooctl install knative -e -k
+glooctl install knative --install-knative-version=0.10.0 --install-eventing-version=0.10.0 -e -k
 
 # apply manifests
 kubectl apply --kubeconfig="$KUBECONFIG" -f manifests/setup

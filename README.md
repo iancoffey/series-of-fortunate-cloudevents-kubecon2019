@@ -22,13 +22,13 @@ As you can see there is a lot going on:
 
 kail -n work-conversations
 
-k logs -l "serving.knative.dev/service=frank" -n work-conversation --all-containers
+k logs -l "serving.knative.dev/service=fred" -n work-conversation --all-containers
 
 k describe containersource.sources.eventing.knative.dev -n work-conversation
 
 # Message containersource output
 
-k logs -l actor=frank -n work-conversation
+k logs -l actor=fred -n work-conversation
 
 # KubeConfig
 

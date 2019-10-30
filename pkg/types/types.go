@@ -26,8 +26,9 @@ const (
 var (
 	// Basically, how often to speak up
 	interjectInConvoRate = 10 * time.Second
-	// Our own little chaos monkey
-	maxLifeTime = time.Duration(rand.Intn(240)) * time.Second
+	// Randomize the lifetime a bit
+	minLifeTime = 30
+	maxLifeTime = 60
 )
 
 type Actor struct {
@@ -237,7 +238,7 @@ func (a *Actor) TickMessages() {
 		}
 	}()
 
-	time.Sleep(maxLifeTime)
+	time.Sleep(time.Duration(rand.Intn(maxLifeTime-minLifeTime+1)) * time.Second)
 	ticker.Stop()
 	done <- true
 
