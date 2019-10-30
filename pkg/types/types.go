@@ -108,6 +108,9 @@ func (a *Actor) Introduction() error {
 	return nil
 }
 func (a *Actor) SpeakToAll(eventType string, e Exchange) error {
+	if a.Debug {
+		log.Printf("at=speak-to-all eventType=%s", eventType)
+	}
 	cs := a.ContainerSource(eventType, "all", e.Output)
 	_, err := a.EventingClient.SourcesV1alpha1().ContainerSources(a.Namespace).Create(cs)
 	return err

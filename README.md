@@ -2,7 +2,7 @@
 
 This session will work to leverage CloudEvents and Knative Eventing to build a solution to automated conversations, with the conversation flow provided by the base projects.
 
-New actors will boot and make themselves known to the group, and after this, they will just begin conversing!
+New actors will boot and make themselves known to the group, and after this, they will begin conversing!
 
 ## Create an actor
 
@@ -30,4 +30,6 @@ k describe containersource.sources.eventing.knative.dev -n work-conversation
 
 k logs -l actor=frank -n work-conversation
 
-## Third component
+# KubeConfig
+
+export KUBECONFIG="$(kind get kubeconfig-path --name="conversations")"

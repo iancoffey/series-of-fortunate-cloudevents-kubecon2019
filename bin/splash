@@ -4,8 +4,23 @@
 
 snap install go --classic
 
-apt install build-essential
+apt install -y build-essential python
 
 GO111MODULE="on" go get sigs.k8s.io/kind@v0.5.1
 
 cp go/bin/kind /usr/local/bin
+
+# Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
+sudo apt-get install -y docker-ce
+sudo systemctl status docker
+
+# kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.16.0/bin/linux/amd64/kubectl
+cp kubectl /usr/local/bin/
+chmod 755 /usr/local/bin/kubectl
+
+# Kail
+bash <( curl -sfL https://raw.githubusercontent.com/boz/kail/master/godownloader.sh) -b "/root/go/bin"
+cp /root/go/bin/kail /usr/local/bin/
