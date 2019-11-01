@@ -14,6 +14,7 @@ import (
 	k8slabels "k8s.io/apimachinery/pkg/labels"
 	sourcesv1 "knative.dev/eventing/pkg/apis/sources/v1alpha1"
 	eventingClientset "knative.dev/eventing/pkg/client/clientset/versioned"
+	apisv1alpha1 "knative.dev/pkg/apis/v1alpha1"
 )
 
 const (
@@ -335,11 +336,13 @@ func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourc
 					},
 				},
 			},
-			Sink: &corev1.ObjectReference{
-				Name:       a.ConvoBroker,
-				Namespace:  a.Namespace,
-				Kind:       "Broker",
-				APIVersion: "eventing.knative.dev/v1alpha1",
+			Sink: &apisv1alpha1.Destination{
+				Ref: &corev1.ObjectReference{
+					Name:       a.ConvoBroker,
+					Namespace:  a.Namespace,
+					Kind:       "Broker",
+					APIVersion: "eventing.knative.dev/v1alpha1",
+				},
 			},
 		},
 	}

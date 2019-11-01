@@ -25,8 +25,7 @@
 package container // import "cloud.google.com/go/container/apiv1"
 
 import (
-	"context"
-
+	"golang.org/x/net/context"
 	"google.golang.org/grpc/metadata"
 )
 
