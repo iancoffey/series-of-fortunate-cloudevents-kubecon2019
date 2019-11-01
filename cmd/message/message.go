@@ -55,7 +55,7 @@ func main() {
 			Type:    cfg.EventType,
 			Subject: &cfg.RecipientName,
 			Source:  *types.ParseURLRef(cfg.SenderName),
-		}.AsV03(),
+		}.AsV1(),
 		Data: payload,
 	}
 

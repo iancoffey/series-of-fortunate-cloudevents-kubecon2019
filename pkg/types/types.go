@@ -200,7 +200,7 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	log.Printf("cloudevent-> \n%s\n", event)
 
 	// Record the message to our convo dialog stream
-	log.Printf("(%s) %s said %s<-conversation\n", a.Name, payload.Message, event.Source())
+	log.Printf("conversation->(%s) %s said %s\n", a.Name, payload.Message, event.Source())
 
 	// Lets reply as well
 	// Our actor will respond with a similar types message - unless they are angry or asleep of course
