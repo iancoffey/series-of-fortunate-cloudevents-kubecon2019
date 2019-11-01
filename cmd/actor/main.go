@@ -55,7 +55,7 @@ func main() {
 	// setup CloudEvents client
 	t, err := cloudevents.NewHTTPTransport(
 		cloudevents.WithTarget(localBindAddress),
-		cloudevents.WithEncoding(cloudevents.HTTPBinaryV02),
+		cloudevents.WithEncoding(cloudevents.HTTPBinaryV1),
 	)
 	if err != nil {
 		log.Fatalf("failed to create transport: %q", err)

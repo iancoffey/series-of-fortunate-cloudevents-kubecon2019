@@ -34,7 +34,7 @@ func main() {
 
 	t, err := cloudevents.NewHTTPTransport(
 		cloudevents.WithTarget(cfg.Sink),
-		cloudevents.WithEncoding(cloudevents.HTTPBinaryV03),
+		cloudevents.WithEncoding(cloudevents.HTTPBinaryV1),
 	)
 	if err != nil {
 		log.Fatalf("failed to create transport %q", err)
