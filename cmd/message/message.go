@@ -50,7 +50,7 @@ func main() {
 	}
 
 	event := cloudevents.Event{
-		Context: cloudevents.EventContextV03{
+		Context: cloudevents.EventContextV1{
 			ID:      uuid.New().String(),
 			Type:    cfg.EventType,
 			Subject: &cfg.RecipientName,
