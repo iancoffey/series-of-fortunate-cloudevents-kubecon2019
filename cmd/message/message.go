@@ -5,6 +5,7 @@ import (
 	"log"
 
 	cloudevents "github.com/cloudevents/sdk-go"
+	cetypes "github.com/cloudevents/sdk-go/pkg/cloudevents"
 	"github.com/cloudevents/sdk-go/pkg/cloudevents/types"
 	"github.com/google/uuid"
 	convoTypes "github.com/iancoffey/kubecon-cloudevent-demo-app/pkg/types"
@@ -50,18 +51,20 @@ func main() {
 	}
 
 	event := cloudevents.Event{
-		Context: cloudevents.EventContextV1{
+		Context: &cloudevents.EventContextV1{
 			ID:      uuid.New().String(),
 			Type:    cfg.EventType,
 			Subject: &cfg.RecipientName,
 			Source:  *types.ParseURIRef(cfg.SenderName),
-		}.AsV1(),
+		},
 		Data: payload,
 	}
+	event.SetSpecVersion(cetypes.CloudEventsVersionV1)
 
 	_, _, err = c.Send(context.Background(), event)
 	if err != nil {
 		log.Fatalf("failed to send cloudevent: %q", err)
 	}
 	log.Printf("Cloudevent sent to %s", cfg.RecipientName)
+	log.Printf("Cloudevent Version %s", event.Context.GetSpecVersion())
 }
