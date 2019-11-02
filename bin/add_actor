@@ -38,6 +38,7 @@ spec:
       containers:
       - name: speaker
         image: $ACTOR_IMAGE
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
