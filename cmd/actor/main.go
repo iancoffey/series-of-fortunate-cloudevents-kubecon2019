@@ -16,11 +16,11 @@ import (
 
 const (
 	// Every so often its important to speak up in a conversation to ensure it stays interesting
-	interjectInConvoRate = 5 * time.Second
+	interjectInConvoRate = 20 * time.Second
 	// bind address
 	localBindAddress = "http://0.0.0.0:8080/"
 	// we need time for dns to start resolving
-	wakeUpDelay = 5 * time.Second
+	wakeUpDelay = 10 * time.Second
 )
 
 func main() {
