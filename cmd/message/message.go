@@ -54,7 +54,7 @@ func main() {
 			ID:      uuid.New().String(),
 			Type:    cfg.EventType,
 			Subject: &cfg.RecipientName,
-			Source:  *types.ParseURLRef(cfg.SenderName),
+			Source:  *types.ParseURIRef(cfg.SenderName),
 		}.AsV1(),
 		Data: payload,
 	}
