@@ -200,7 +200,7 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	log.Printf("cloudevent-> \n%s\n", event)
 
 	// Record the message to our convo dialog stream
-	log.Printf("conversation->(%s) %s said %s\n", a.Name, payload.Message, event.Source())
+	log.Printf("conversation->(%s) %s replied %s\n", a.Name, payload.Message, event.Source())
 
 	// Lets reply as well
 	// Our actor will respond with a similar types message - unless they are angry or asleep of course
@@ -222,14 +222,6 @@ func (a *Actor) TickMessages() {
 		case <-done:
 			return
 		case <-ticker.C:
-			//	a.GarbageCollect(false)
-			//		if len(a.actors) == 0 {
-			//			if a.Debug {
-			//				log.Println("no actors for %s, no need to speak", actor.Name)
-			//			}
-
-			//			continue
-			//		}
 			a.GarbageCollect(true)
 			if err := a.SpeakToAll(MessageEventType, a.ConversationMessage()); err != nil {
 				log.Printf("at=TickMessages error=%q", err)
@@ -347,20 +339,3 @@ func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourc
 		},
 	}
 }
-
-//func (a *Actor) actorDNSResolved(actor, namespace string) (bool, error) {
-//	hosts, err := net.LookupHost(fmt.Sprintf("%s.%s.svc.cluster.local", actor, namespace))
-//	if err != nil {
-//		if _, ok := err.(*net.DNSError); ok {
-//			return false, nil
-//		}
-//		return false, err
-//	}
-//
-//	// Ensure we have a host resolved
-//	if len(hosts) > 0 {
-//		return true, nil
-//	}
-//
-//	return false, nil
-//}
