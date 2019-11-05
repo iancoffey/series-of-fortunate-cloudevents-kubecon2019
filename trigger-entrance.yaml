@@ -1,0 +1,67 @@
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: shiny-trigger-all
+  namespace: work-conversation
+spec:
+  broker: conversation-broker
+  filter:
+    attributes:
+      type: com.iancoffey.conversation.shiny
+      subject: all
+  subscriber:
+    ref:
+      apiVersion: v1
+      kind: Service
+      name: tracy
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: shiny-trigger-all
+  namespace: work-conversation
+spec:
+  broker: conversation-broker
+  filter:
+    attributes:
+      type: com.iancoffey.conversation.shiny
+      subject: all
+  subscriber:
+    ref:
+      apiVersion: v1
+      kind: Service
+      name: fred
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: shiny-trigger-all
+  namespace: work-conversation
+spec:
+  broker: conversation-broker
+  filter:
+    attributes:
+      type: com.iancoffey.conversation.shiny
+      subject: all
+  subscriber:
+    ref:
+      apiVersion: v1
+      kind: Service
+      name: jane
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: shiny-trigger-all
+  namespace: work-conversation
+spec:
+  broker: conversation-broker
+  filter:
+    attributes:
+      type: com.iancoffey.conversation.shiny
+      subject: all
+  subscriber:
+    ref:
+      apiVersion: v1
+      kind: Service
+      name: peter

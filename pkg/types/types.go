@@ -20,8 +20,8 @@ import (
 const (
 	MessageEventType = "com.iancoffey.conversation.message"
 
-	// ohhh fun. lets cast this last and put everyone to sleep
-	SleepSpellEventType = "com.iancoffey.conversation.sleepspell"
+	// this event type is so interesting and shiny that it distracts everyone
+	ShinySpellEventType = "com.iancoffey.conversation.shiny"
 )
 
 var (
@@ -159,14 +159,14 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	}
 
 	// Warning: Our actors may become entranced by shiny objects!
-	if event.Type() == SleepSpellEventType {
-		log.Printf("conversation-> (%s) has become distracted by a shiny object thrown by!\n", a.Name, event.Source())
+	if event.Type() == ShinySpellEventType {
+		log.Printf("conversation-> (%s) has become distracted by a shiny object produced by %s \n", a.Name, event.Source())
 
 		a.entranced = true
 		return nil
 	}
 	if a.entranced {
-		if err := a.SpeakToActor(SleepSpellEventType, event.Source(), a.ShinyMessage()); err != nil {
+		if err := a.SpeakToActor(ShinySpellEventType, event.Source(), a.ShinyMessage()); err != nil {
 			log.Printf("SpeakToActor Error: %s", err)
 			return nil
 		}
