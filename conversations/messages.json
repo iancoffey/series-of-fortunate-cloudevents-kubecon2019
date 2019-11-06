@@ -3,6 +3,50 @@
     {
     "hello": [
         {
+          "output": "fancy to see you here",
+          "input": "hey there champ"
+        },
+        {
+          "output": "and how are you today?",
+          "input": "hey Im great"
+        }
+      ],
+    "shiny": [
+        {
+          "output": "that IS TOO HARD to LOOk away FROM...cant...stop",
+          "input": "wow look it IS shiny"
+        },
+        {
+          "output": "its....just....so........glittery",
+          "input": "GLITTERY!!!!"
+        }
+      ],
+      "conversation": [
+        {
+          "output": "I wont ever tell you, even if you ask twice",
+          "input": "is that right"
+        },
+        {
+          "output": "i wonder where the sailboat you mentioned went o",
+          "input": "I think you are saying interesting stuff"
+        },
+        {
+          "output": "OK EVERYONE QUIET DOWN I HAVE A THOUGHT TO SHARE",
+          "input": "night night!"
+        },
+        {
+          "output": "its cool i wasnt speaking anyway...grrr",
+          "input": "wow chill"
+        },
+        {
+          "output": "frankly thats just rude",
+          "input": "wow this person is ready to FIGHT yall"
+        }
+      ]
+    },
+    {
+    "hello": [
+        {
           "output": "heyo",
           "input": "nice to see you"
         },

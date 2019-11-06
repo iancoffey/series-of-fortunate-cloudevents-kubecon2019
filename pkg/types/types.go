@@ -110,6 +110,16 @@ func (a *Actor) SpeakToActor(eventType, target string, e Exchange) error {
 	return err
 }
 
+func (a *Actor) ReplyToActor(eventType, target string, e Exchange) error {
+	if len(a.actors) == 0 {
+		return errors.New("This actor has no friends! And you shouldnt be here.")
+	}
+
+	cs := a.ContainerSource(eventType, target, e.Input)
+	_, err := a.EventingClient.SourcesV1alpha1().ContainerSources(a.Namespace).Create(cs)
+	return err
+}
+
 func (a *Actor) AddToFriends(name string) {
 	found := false
 	for _, ac := range a.actors {
@@ -186,7 +196,7 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 
 	// Lets reply as well
 	// Our actor will respond with a similar types message - unless they are angry or asleep of course
-	if err := a.SpeakToActor(MessageEventType, event.Source(), a.ConversationMessage()); err != nil {
+	if err := a.ReplyToActor(MessageEventType, event.Source(), a.ConversationMessage()); err != nil {
 		log.Printf("SpeakToActor Error: %s", err)
 		return nil
 	}
