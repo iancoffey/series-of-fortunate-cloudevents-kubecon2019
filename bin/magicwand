@@ -39,7 +39,7 @@ spec:
               value: "true"
   sink:
     apiVersion: serving.knative.dev/v1alpha1
-    kind: Service
-    name: $ACTOR_NAME
+    kind: Broker
+    name: $BROKER_NAME
 EOS
 envsubst < manifests/people/$ACTOR_NAME/shiny.yaml | kubectl apply -f -
