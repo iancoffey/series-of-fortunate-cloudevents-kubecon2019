@@ -38,7 +38,7 @@ spec:
             - name: SHINY
               value: "true"
   sink:
-    apiVersion: serving.knative.dev/v1alpha1
+    apiVersion: eventing.knative.dev/v1alpha1
     kind: Broker
     name: $BROKER_NAME
 EOS
