@@ -1,7 +1,7 @@
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Trigger
 metadata:
-  name: shiny-trigger-all
+  name: shiny-trigger-tracy
   namespace: work-conversation
 spec:
   broker: conversation-broker
@@ -18,7 +18,7 @@ spec:
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Trigger
 metadata:
-  name: shiny-trigger-all
+  name: shiny-trigger-fred
   namespace: work-conversation
 spec:
   broker: conversation-broker
@@ -35,7 +35,7 @@ spec:
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Trigger
 metadata:
-  name: shiny-trigger-all
+  name: shiny-trigger-jane
   namespace: work-conversation
 spec:
   broker: conversation-broker
@@ -52,7 +52,7 @@ spec:
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Trigger
 metadata:
-  name: shiny-trigger-all
+  name: shiny-trigger-peter
   namespace: work-conversation
 spec:
   broker: conversation-broker
