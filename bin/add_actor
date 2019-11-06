@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# This script adds a new actor to the k8s cluster!
+
+source ./bin/config.sh
+
+export ACTOR_NAME=$1
+export MESSAGES_DATA="$(cat conversations/messages_escaped.json)"
+
+if [ -z $ACTOR_NAME ]
+then
+	echo "ACTOR_NAME must be set"
+	exit 1
+fi
+
+mkdir -p manifests/people/$ACTOR_NAME
+
+echo "Creating $ACTOR_NAME Service"
+
+cat <<EOS > manifests/people/$ACTOR_NAME/service.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $ACTOR_NAME
+  namespace: $NAMESPACE
+spec:
+  selector:
+    matchLabels:
+      actor: $ACTOR_NAME
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        actor: $ACTOR_NAME
+    spec:
+      serviceAccountName: actor-account
+      containers:
+      - name: speaker
+        image: $ACTOR_IMAGE
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: NAME
+          value: $ACTOR_NAME
+        - name: MESSAGES_DATA
+          value: '$MESSAGES_DATA'
+        - name: MESSAGE_IMAGE
+          value: $MESSAGE_IMAGE
+        - name: DEBUG
+          value: "TRUE"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: $ACTOR_NAME
+  namespace: $NAMESPACE
+  labels:
+    actor: $ACTOR_NAME
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    actor: $ACTOR_NAME
+EOS
+envsubst < manifests/people/$ACTOR_NAME/service.yaml | kubectl apply -f -
+
+cat <<EOS > manifests/people/$ACTOR_NAME/trigger.yaml
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: $ACTOR_NAME-trigger
+  namespace: $NAMESPACE
+spec:
+  broker: conversation-broker
+  filter:
+    attributes:
+      type: com.iancoffey.conversation.message
+      subject: $ACTOR_NAME
+  subscriber:
+    ref:
+      apiVersion: v1
+      kind: Service
+      name: $ACTOR_NAME
+
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: $ACTOR_NAME-trigger-all
+  namespace: $NAMESPACE
+spec:
+  broker: conversation-broker
+  filter:
+    attributes:
+      type: com.iancoffey.conversation.message
+      subject: all
+  subscriber:
+    ref:
+      apiVersion: v1
+      kind: Service
+      name: $ACTOR_NAME
+EOS
+envsubst < manifests/people/$ACTOR_NAME/trigger.yaml | kubectl apply -f -

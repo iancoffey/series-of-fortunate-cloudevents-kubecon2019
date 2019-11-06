@@ -41,5 +41,6 @@ spec:
     apiVersion: eventing.knative.dev/v1alpha1
     kind: Broker
     name: $BROKER_NAME
+    namespace: $NAMESPACE
 EOS
 envsubst < manifests/people/$ACTOR_NAME/shiny.yaml | kubectl apply -f -
