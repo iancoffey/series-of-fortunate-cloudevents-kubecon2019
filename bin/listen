@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # Use kubetail to gather and arrange our convo output!
-kubetail -l actor -n work-conversation|grep conversation\-\>| awk -F\> '{print $2}'
+kail -n work-conversation | grep --line-buffered conversation\-\> | awk -F'conversation->' '{print $2}'

@@ -24,3 +24,5 @@ chmod 755 /usr/local/bin/kubectl
 # Kail
 bash <( curl -sfL https://raw.githubusercontent.com/boz/kail/master/godownloader.sh) -b "/root/go/bin"
 cp /root/go/bin/kail /usr/local/bin/
+
+# we also need kubetail -> https://github.com/johanhaleby/kubetail
