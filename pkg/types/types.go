@@ -135,7 +135,7 @@ func (a *Actor) IsDuplicate(event cloudevents.Event) bool {
 func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	if a.Debug {
 		// TODO: convert to k/v logging
-		log.Printf("Message ID %s Source %s Subject %s", event.ID(), event.Source(), event.Subject())
+		log.Printf("Message Type %s ID %s Source %s Subject %s", event.Type(), event.ID(), event.Source(), event.Subject())
 	}
 	// We want to avoid talking to ourselves
 	if event.Source() == a.Name {
