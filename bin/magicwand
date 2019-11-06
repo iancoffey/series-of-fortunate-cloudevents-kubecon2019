@@ -14,6 +14,8 @@ fi
 
 mkdir -p manifests/people/$ACTOR_NAME
 
+sleep 5
+
 cat <<EOS > manifests/people/$ACTOR_NAME/shiny.yaml
 apiVersion: sources.eventing.knative.dev/v1alpha1
 kind: ContainerSource
@@ -30,7 +32,7 @@ spec:
             - name: EVENT_TYPE
               value: "com.iancoffey.conversation.shiny"
             - name: SENDER_NAME
-              value: "architect"
+              value: "icoffey"
             - name: RECIPIENT_NAME
               value: $ACTOR_NAME
             - name: MESSAGE

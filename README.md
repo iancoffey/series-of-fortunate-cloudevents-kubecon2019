@@ -4,17 +4,19 @@ This session will work to leverage CloudEvents and Knative Eventing to build a s
 
 New actors will boot and make themselves known to the group, and after this, they will begin conversing!
 
+**The actors only print to stdout what they hear, not what they said**. So everything shown in the ./bin/listen script are events that have successfully reached the destination.
+
 ## Create an actor
 
-The `bin/add_actor $NAME $GREETING` script will populate our conversation with a new actor.
+The `bin/add_actor $NAME` script will create and populate the namespace with a new actor, as well as the Knative Triggers necessary to allow them to join the conversation broker.
 
 No other steps are needed for the actor to join the conversation. The actor is assigned a randomized script, which is mounted in a configmap.
 
-Actors only address other actors they have words for, but they can reply to anyone with their default greeting.
+They will address the whole group, or individuals who they know about.
 
 ## Conversation
 
-All of our actors get a conversation type, and each type defines a simple disposition.
+All of our actors are provided a conversation script, which lets them chat.
 
 ## Log / Output Commands for demo
 
@@ -22,13 +24,9 @@ As you can see there is a lot going on:
 
 kail -n work-conversations
 
-kubectl logs -l "serving.knative.dev/service=fred" -n work-conversation --all-containers
+kubectl logs -l "actor=fred" -n work-conversation --all-containers
 
 kubectl describe containersource.sources.eventing.knative.dev -n work-conversation
-
-# Message containersource output
-
-kubectl logs -l actor=fred -n work-conversation
 
 # KubeConfig
 
