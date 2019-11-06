@@ -73,22 +73,6 @@ type ConversationManifests struct {
 	Conversations []Conversation `json:"conversations,omitempty"`
 }
 
-func (a *Actor) HelloMessage() Exchange {
-	return a.Conversation.Hello[rand.Intn(len(a.Conversation.Hello))]
-}
-func (a *Actor) ShinyMessage() Exchange {
-	return a.Conversation.Shiny[rand.Intn(len(a.Conversation.Shiny))]
-}
-
-func (a *Actor) ConversationMessage() Exchange {
-	switch {
-	case a.entranced:
-		return a.ShinyMessage()
-	}
-
-	return a.Conversation.Conversation[rand.Intn(len(a.Conversation.Conversation))]
-}
-
 func (a *Actor) IntroMessage() Exchange {
 	switch {
 	case a.entranced:
@@ -161,9 +145,7 @@ func (a *Actor) GotMessage(ctx context.Context, event cloudevents.Event) error {
 	// Warning: Our actors may become entranced by shiny objects!
 	if event.Type() == ShinySpellEventType {
 		log.Printf("conversation-> (%s) has become distracted by a shiny object produced by %s \n", a.Name, event.Source())
-
 		a.entranced = true
-		return nil
 	}
 	if a.entranced {
 		if err := a.SpeakToActor(ShinySpellEventType, event.Source(), a.ShinyMessage()); err != nil {
@@ -283,7 +265,7 @@ func (a *Actor) GarbageCollect(force bool) {
 
 func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourcesv1.ContainerSource {
 	if a.Debug {
-		log.Printf("ContainerSource type: %s receipient: %s message: %s entranced: %s", eventType, recipientName, message, a.entranced)
+		log.Printf("ContainerSource type: %s receipient: %s message: %q entranced: %b", eventType, recipientName, message, a.entranced)
 	}
 
 	labels := make(map[string]string)
@@ -338,4 +320,20 @@ func (a *Actor) ContainerSource(eventType, recipientName, message string) *sourc
 			},
 		},
 	}
+}
+
+func (a *Actor) HelloMessage() Exchange {
+	return a.Conversation.Hello[rand.Intn(len(a.Conversation.Hello))]
+}
+func (a *Actor) ShinyMessage() Exchange {
+	return a.Conversation.Shiny[rand.Intn(len(a.Conversation.Shiny))]
+}
+
+func (a *Actor) ConversationMessage() Exchange {
+	switch {
+	case a.entranced:
+		return a.ShinyMessage()
+	}
+
+	return a.Conversation.Conversation[rand.Intn(len(a.Conversation.Conversation))]
 }
