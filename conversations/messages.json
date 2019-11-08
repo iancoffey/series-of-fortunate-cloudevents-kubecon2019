@@ -3,6 +3,50 @@
     {
     "hello": [
         {
+          "output": "..... hello",
+          "input": "yo"
+        },
+        {
+          "output": "is it me youre looking for",
+          "input": "Houston we have a problem"
+        }
+      ],
+    "shiny": [
+        {
+          "output": "that IS TOO HARD to LOOk away FROM...cant...stop",
+          "input": "wow look it IS shiny"
+        },
+        {
+          "output": "its....just....so........glittery",
+          "input": "GLITTERY!!!!"
+        }
+      ],
+      "conversation": [
+        {
+          "output": "Are you crying",
+          "input": "no"
+        },
+        {
+          "output": "AM I CRYING",
+          "input": "I think you are saying interesting stuff"
+        },
+        {
+          "output": "THERES NO CRYING",
+          "input": "WILSON"
+        },
+        {
+          "output": "THERES NO CRYING IN BASEBALL",
+          "input": "this town aint big enough for the two of us"
+        },
+        {
+          "output": "life is like a box of chocolates",
+          "input": "you never know what youre gonna get"
+        }
+      ]
+    },
+    {
+    "hello": [
+        {
           "output": "fancy to see you here",
           "input": "hey there champ"
         },
@@ -188,7 +232,7 @@
           "input": "holy macaroni calm down"
         },
         {
-          "output": "im MAD and I cant HIDE IT",
+          "output": "what are we again? aside from random",
           "input": "you are too loud! and wild!"
         }
       ]

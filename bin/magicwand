@@ -30,7 +30,7 @@ spec:
           name: $ACTOR_NAME-magic-spell-shiny
           env:
             - name: EVENT_TYPE
-              value: "com.iancoffey.conversation.shiny"
+              value: "com.iancoffey.conversation.distracted"
             - name: SENDER_NAME
               value: "icoffey"
             - name: RECIPIENT_NAME

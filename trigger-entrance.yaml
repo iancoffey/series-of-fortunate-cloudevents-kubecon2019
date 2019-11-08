@@ -7,7 +7,7 @@ spec:
   broker: conversation-broker
   filter:
     attributes:
-      type: com.iancoffey.conversation.shiny
+      type: com.iancoffey.conversation.distracted
       subject: all
   subscriber:
     ref:
@@ -24,7 +24,7 @@ spec:
   broker: conversation-broker
   filter:
     attributes:
-      type: com.iancoffey.conversation.shiny
+      type: com.iancoffey.conversation.distracted
       subject: all
   subscriber:
     ref:
@@ -41,7 +41,7 @@ spec:
   broker: conversation-broker
   filter:
     attributes:
-      type: com.iancoffey.conversation.shiny
+      type: com.iancoffey.conversation.distracted
       subject: all
   subscriber:
     ref:
@@ -58,7 +58,7 @@ spec:
   broker: conversation-broker
   filter:
     attributes:
-      type: com.iancoffey.conversation.shiny
+      type: com.iancoffey.conversation.distracted
       subject: all
   subscriber:
     ref:
